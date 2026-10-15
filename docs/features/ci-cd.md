@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | In progress (workflows written; run once the repo is on GitHub) |
+| **Status**   | In progress (CI: Live, green since 2026-10-15; deploy: waiting on the Fly app) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
@@ -32,8 +32,10 @@ is what's live.
 - **pre-commit hooks only:** they don't run for reviewers or Dependabot.
 
 ## How it's set up
-1. Create a public repo at https://github.com/new (e.g. `ticket-tracker`) and push.
-2. Repo **Settings → Code security**: enable *Secret scanning* and *Push protection*.
+1. Public repo https://github.com/AlekseiSkr/ticket-tracker, created on 2026-10-15 with
+   `gh repo create AlekseiSkr/ticket-tracker --public --source . --push`.
+2. Secret scanning, push protection and Dependabot alerts were enabled on 2026-10-15 via the
+   GitHub API (equivalent to repo **Settings → Code security**).
 3. Once the Fly app exists (see [hosting-fly.md](hosting-fly.md)):
    - `fly tokens create deploy -x 999999h`, then add it as the Actions secret `FLY_API_TOKEN`
      (Settings → Secrets and variables → Actions).
@@ -51,7 +53,12 @@ is what's live.
 - **`workflow_run` deploys use the workflow file from `main`**, not from the PR.
 - **gitleaks-action is free for personal repos.** Organisation repos need a license key.
 - **Action versions are pinned to major tags.** Dependabot keeps them current.
+- **CI runs with `DJANGO_DEBUG` unset**, which means production security settings, so plain
+  HTTP requests in tests get a 301 to HTTPS. Use `client.get(..., secure=True)`. This was
+  the first CI failure, on 2026-10-15.
+- **gitleaks-action@v2 targets Node 20**, which GitHub now forces onto Node 24 (a warning,
+  not a failure).
 
 ## Open items
-- [ ] Push the repo and confirm CI is green (2026-10-15).
+- [x] Push the repo and confirm CI is green (done 2026-10-15, commit `432472c`).
 - [ ] Wire up `FLY_API_TOKEN` and `FLY_DEPLOY_ENABLED` after the Fly app exists.

@@ -67,4 +67,4 @@ or local disk. Silent fallbacks are a classic production bug, and the brief call
 
 ## Open items
 - [ ] Create production secrets once Neon, R2 and Fly exist (see their docs).
-- [ ] Enable GitHub secret scanning push protection when the repo is created.
+- [x] Enable GitHub secret scanning push protection (done 2026-10-15).
