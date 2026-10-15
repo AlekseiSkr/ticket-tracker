@@ -67,7 +67,7 @@ is what's live.
 - **On 2026-10-15 PR #2 moved Actions** to `checkout@v7`, `setup-uv@v7` and `gitleaks@v3`.
 
 ## Open items
-- [x] Push the repo and confirm CI is green (done 2026-10-15, commit `9676cde`).
+- [x] Push the repo and confirm CI is green (done 2026-10-15, commit `ee7172f`).
 - [x] Wire up `FLY_API_TOKEN` and `FLY_DEPLOY_ENABLED` (done 2026-10-15).
 - [ ] **Rotate `FLY_API_TOKEN` before 2027-10-15**, when it expires.
   List and revoke tokens with `fly tokens list -a aleksei-ticket-tracker`.
