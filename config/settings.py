@@ -183,14 +183,26 @@ UNFOLD = {
             "950": "#2c362a",
         },
         "font": {
-            "subtle-dark": "#868783",
+            "subtle-dark": "#a3a4a0",  # 4.5:1+ on the raised greys
             "default-dark": "#b8b9b6",
             "important-dark": "#ebeceb",
         },
     },
-    "STYLES": [
-        "https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,125,500..900;1,125,700..900"
-        "&family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap",
-        lambda request: static("core/theme.css"),
+    # Fonts are self-hosted from core/static/core/fonts/ (declared in theme.css).
+    "STYLES": [lambda request: static("core/theme.css")],
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "href": lambda request: static("core/favicon.svg"),
+        },
     ],
+    # "/" only redirects back to the admin, so a "Return to site" link would be a dead loop.
+    "SITE_URL": None,
+    "LOGIN": {"image": lambda request: static("core/login-panel.svg")},
+    "ENVIRONMENT": "core.admin_ui.environment_callback",
+    # Model search (COMMAND.search_models) stays off: it lists str(obj) for every searchable
+    # model, which would bypass per-role field hiding once the ticket admins exist.
+    "SIDEBAR": {"show_search": True, "show_all_applications": True},
 }

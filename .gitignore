@@ -21,6 +21,9 @@ media/
 # assignment's internal grading notes; never publish).
 takehome/
 
+# impeccable design-detector cache (its shared config.json is committed)
+.impeccable/hook.cache.json
+
 # Editors / OS
 .idea/
 .vscode/

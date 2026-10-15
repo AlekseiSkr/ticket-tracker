@@ -8,35 +8,35 @@
 | **Updated**  | 2026-10-15 |
 | **Where**    | Served by WhiteNoise at `/static/core/` |
 | **Cost**     | $0 |
-| **Depends on** | [../../../docs/features/design-language.md](../../../docs/features/design-language.md) |
+| **Depends on** | [../../../DESIGN.md](../../../DESIGN.md), [../../../docs/features/design-language.md](../../../docs/features/design-language.md) |
 
 ## What
-`theme.css` holds the parts of the Benrey design language that Unfold's colour settings can't express:
-- type;
-- lime buttons with dark text;
-- caption headings;
-- card edges;
-- focus rings;
-- load motion.
-
-`UNFOLD["STYLES"]` in `config/settings.py` loads it on every admin page.
+The admin's design-system assets, loaded through `UNFOLD` settings.
 
 ## Why
-Static files namespaced under the `core` app need no `STATICFILES_DIRS` entry.
+Static files namespaced under the `core` app need no `STATICFILES_DIRS` entry. The fonts are
+self-hosted, which drops the Google Fonts dependency the Phase 5 CSP would otherwise have to
+allow.
 
-**Rejected:** a project-level `static/` folder, which would mean one more setting for a single file.
+**Rejected:**
+- Google Fonts CSS (a third-party request on every page).
+- A project-level `static/` folder (one more setting).
 
 ## How it's set up
-| File | Role |
+| Path | Role |
 |---|---|
-| `theme.css` | Unlayered overrides on top of Unfold's layered Tailwind CSS. Tokens are listed at the top as custom properties. |
+| `theme.css` | Unlayered overrides on top of Unfold's layered Tailwind CSS: fonts, lime controls, captions, the lit-line nav, browser surfaces. Tokens are custom properties at the top. |
+| `fonts/` | Geist, Geist Mono and Archivo (latin subset, variable woff2) with their `OFL-*.txt` licences, which must ship with the files. |
+| `favicon.svg` | A lime square with a ticket stub (`UNFOLD["SITE_FAVICONS"]`). |
+| `login-panel.svg` | The login side panel: khaki grid and lit line, decorative (`UNFOLD["LOGIN"]["image"]`). |
 
 ## Who owns what
-No credentials.
+No credentials. The fonts are SIL OFL 1.1.
 
 ## Gotchas
 - **This folder is public** (`collectstatic` publishes it). Never put anything private here.
 - **Don't wrap `theme.css` in `@layer`.** It only wins because it is unlayered.
+- **The fonts are the latin subset only.** Add `latin-ext` files if names with other diacritics show up.
 
 ## Open items
 - [ ] None.

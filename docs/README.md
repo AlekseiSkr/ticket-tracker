@@ -24,7 +24,9 @@ nobody reads because it's long is worse than no doc):
 |---|---|---|---|
 | `config/` | Settings, env helpers, S3 storage backend, URLs, WSGI/ASGI | Live | [config/README.md](../config/README.md) |
 | `core/` | Health/readiness middleware, ops infrastructure | Live | [core/README.md](../core/README.md) |
-| `core/static/core/` | Admin theme stylesheet (Benrey design language) | Live | [core/static/core/README.md](../core/static/core/README.md) |
+| `core/static/core/` | Admin theme: stylesheet, self-hosted fonts, favicon, login art | Live | [core/static/core/README.md](../core/static/core/README.md) |
+| `templates/` | Branded 404/500 pages | Live | [templates/README.md](../templates/README.md) |
+| `templates/admin/` | Thin Unfold overrides: skip link, dashboard greeting | Live | [templates/admin/README.md](../templates/admin/README.md) |
 | `core/management/` | Management-command package | Live | [core/management/README.md](../core/management/README.md) |
 | `core/management/commands/` | `ensure_bucket` | Live | [core/management/commands/README.md](../core/management/commands/README.md) |
 | `tickets/` | Ticket domain: models, rules, admin | Planned (Phase 1) | [tickets/README.md](../tickets/README.md) |
@@ -35,7 +37,8 @@ nobody reads because it's long is worse than no doc):
 | `.github/` | Dependabot, repo automation | Live | [.github/README.md](../.github/README.md) |
 | `.github/workflows/` | CI and deploy pipelines | Live | [.github/workflows/README.md](../.github/workflows/README.md) |
 
-The root is covered by [../README.md](../README.md) (run it) and [../CLAUDE.md](../CLAUDE.md) (working rules).
+The root is covered by [../README.md](../README.md) (run it), [../CLAUDE.md](../CLAUDE.md) (working rules),
+[../PRODUCT.md](../PRODUCT.md) (product context) and [../DESIGN.md](../DESIGN.md) (the admin's design system).
 
 ## Feature index
 
@@ -47,7 +50,7 @@ The root is covered by [../README.md](../README.md) (run it) and [../CLAUDE.md](
 | Database (Postgres / Neon Frankfurt) | Live | [database.md](features/database.md) |
 | File storage (SeaweedFS / Cloudflare R2 EU) | Live | [file-storage.md](features/file-storage.md) |
 | Admin UI (Django admin + Unfold) | In progress | [admin-ui.md](features/admin-ui.md) |
-| Design language (Benrey: dark, lime, wide oblique type) | Live | [design-language.md](features/design-language.md) |
+| Design language (Benrey: dark, lime, lit-line nav, self-hosted fonts) | Live | [design-language.md](features/design-language.md) |
 | CI/CD (GitHub Actions → Fly) | Live | [ci-cd.md](features/ci-cd.md) |
 | Hosting (Fly.io, aleksei-ticket-tracker.fly.dev) | Live | [hosting-fly.md](features/hosting-fly.md) |
 | Authentication and roles | Planned | [authentication-and-roles.md](features/authentication-and-roles.md) |
