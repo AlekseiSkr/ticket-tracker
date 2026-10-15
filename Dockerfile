@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- base: Python + uv -------------------------------------------------------
-FROM python:3.13-slim AS base
+FROM python:3.14-slim AS base
 COPY --from=ghcr.io/astral-sh/uv:0.13.1 /uv /uvx /bin/
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
