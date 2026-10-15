@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Live (local); production once Fly is set up |
+| **Status**   | Live (local and production; Fly check passing since 2026-10-15) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |

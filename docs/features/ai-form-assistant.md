@@ -50,5 +50,8 @@ fields the Agent can't see.
 - **CSRF:** the widget sends `X-CSRFToken`, and the endpoint keeps CSRF protection on.
 
 ## Open items
+- [ ] A Groq API key was created by Aleksei on 2026-10-15 and is kept in the password
+  manager. Set it with `fly secrets set GROQ_API_KEY=… -a aleksei-ticket-tracker` when
+  Phase 3 is built.
 - [ ] Confirm the Groq free-plan limits in the console (the docs page shows only Developer
   plan limits).

@@ -41,13 +41,13 @@ The root is covered by [../README.md](../README.md) (run it) and [../CLAUDE.md](
 | Feature | Status | Doc |
 |---|---|---|
 | Local development (Docker) | Live | [local-development.md](features/local-development.md) |
-| Configuration and secrets | In progress | [configuration-and-secrets.md](features/configuration-and-secrets.md) |
+| Configuration and secrets | Live | [configuration-and-secrets.md](features/configuration-and-secrets.md) |
 | Health checks | Live | [health-checks.md](features/health-checks.md) |
-| Database (Postgres / Neon) | In progress | [database.md](features/database.md) |
-| File storage (SeaweedFS / Cloudflare R2) | In progress | [file-storage.md](features/file-storage.md) |
+| Database (Postgres / Neon Frankfurt) | Live | [database.md](features/database.md) |
+| File storage (SeaweedFS / Cloudflare R2 EU) | Live | [file-storage.md](features/file-storage.md) |
 | Admin UI (Django admin + Unfold) | In progress | [admin-ui.md](features/admin-ui.md) |
 | CI/CD (GitHub Actions) | In progress (CI Live) | [ci-cd.md](features/ci-cd.md) |
-| Hosting (Fly.io) | Planned | [hosting-fly.md](features/hosting-fly.md) |
+| Hosting (Fly.io, aleksei-ticket-tracker.fly.dev) | Live | [hosting-fly.md](features/hosting-fly.md) |
 | Authentication and roles | Planned | [authentication-and-roles.md](features/authentication-and-roles.md) |
 | AI form assistant (Groq) | Planned | [ai-form-assistant.md](features/ai-form-assistant.md) |
 | Error monitoring (Sentry) | Planned | [error-monitoring.md](features/error-monitoring.md) |

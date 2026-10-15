@@ -2,11 +2,11 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Planned |
+| **Status**   | Live since 2026-10-15 at https://aleksei-ticket-tracker.fly.dev/ |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
-| **Where**    | Fly.io, region `fra` (Frankfurt), app `ticket-tracker` (rename if taken), 1 × shared-cpu-1x 512 MB |
+| **Where**    | Fly.io personal org (slug `personal`, dashboard name `aleksei-613`), app **`aleksei-ticket-tracker`**, region `fra`, 1 × shared-cpu-1x 512 MB (machine `286557e7c04708`), shared IPv4 + dedicated IPv6 |
 | **Cost**     | About $4.26/mo (calculated from Fly's regional pricing; `iad` list price is $3.69; confirm in the dashboard). No free tier for new orgs. |
 | **Depends on** | [database.md](database.md), [file-storage.md](file-storage.md), [ci-cd.md](ci-cd.md) |
 
@@ -30,15 +30,30 @@ Fly's `release_command` before each release goes live.
   cost about 0.3–0.45 s of extra DB latency per page.
 
 ## How it's set up
-1. https://fly.io/app/sign-up: create an account and add a card (needed beyond the trial).
-2. Install flyctl: https://fly.io/docs/flyctl/install/ (Windows:
-   `pwsh -Command "iwr https://fly.io/install.ps1 -useb | iex"`), then `fly auth login`.
-3. `fly apps create <name>`, then set `app = "<name>"` in `fly.toml`.
+What was done on 2026-10-15:
+1. Installed flyctl v0.4.118 (`iwr https://fly.io/install.ps1 -useb | iex`, which goes to
+   `%USERPROFILE%\.fly\bin`), then `fly auth login`.
+2. `fly apps create aleksei-ticket-tracker --org personal`. `ticket-tracker` was taken, since
+   app names are global. `--org aleksei-613` is rejected by `apps create`, although
+   `orgs show aleksei-613` resolves to the personal org.
+3. Secrets staged with `fly secrets import --stage` (values from stdin, never in shell
+   history), then `fly deploy --remote-only --ha=false`. The image is 87 MB, and
+   `release_command` migrated Neon.
+
+To rebuild from nothing, the steps are:
 4. Set the secrets (see [configuration-and-secrets.md](configuration-and-secrets.md)):
    `fly secrets set DJANGO_SECRET_KEY=… DJANGO_ALLOWED_HOSTS=<name>.fly.dev DJANGO_CSRF_TRUSTED_ORIGINS=https://<name>.fly.dev DATABASE_URL=… S3_ENDPOINT_URL=… S3_BUCKET=… S3_ACCESS_KEY_ID=… S3_SECRET_ACCESS_KEY=…`
-5. `fly deploy`. Later deploys go through CI ([ci-cd.md](ci-cd.md)).
+5. `fly deploy --ha=false`. Later deploys go through CI ([ci-cd.md](ci-cd.md)).
 6. Create the first admin: `fly ssh console -C "python manage.py createsuperuser"`.
 7. Check: `curl https://<name>.fly.dev/healthz` and `/readyz`.
+
+**Verified live on 2026-10-15:**
+- `/healthz` ok, `/readyz` with the database up
+- `/admin/login/` returns 200, TTFB about 0.25 s (from Estonia)
+- HTTP redirects to HTTPS (301)
+- hashed static CSS returns 200
+- headers present: HSTS 1 year, X-Frame-Options DENY, nosniff
+- Fly check: 1 of 1 passing
 
 ## Who owns what
 - **Fly account and billing card:** Aleksei.
@@ -53,9 +68,16 @@ Fly's `release_command` before each release goes live.
   shared disk.
 - **512 MB RAM:** gunicorn runs 2 workers × 4 threads. If memory runs short (spike S9), go to
   1 GB (about $7.7/mo in `fra`).
-- **App names are global across Fly.** `ticket-tracker` may already be taken.
+- **App names are global across Fly.** `ticket-tracker` was taken.
+- **Use `--ha=false` on deploy.** By default Fly creates 2 machines for availability, which
+  would double the cost.
+- **`S3_REGION` and `S3_ADDRESSING_STYLE` are set both as secrets and in `fly.toml [env]`.**
+  Secrets win when both exist.
+- **flyctl lives in `%USERPROFILE%\.fly\bin`.** Shells opened before the install don't have it
+  on PATH.
 
 ## Open items
-- [ ] Create the Fly account and app (2026-10-15).
+- [x] Create the Fly account and app (done 2026-10-15).
+- [ ] Create the first admin user: `fly ssh console -a aleksei-ticket-tracker -C "python manage.py createsuperuser"`.
 - [ ] Spike S1: warm changelist p50 ≤ 400 ms from the EU, first request after Neon idle ≤ 2 s.
 - [ ] Spike S9: gunicorn RSS < 400 MB under a 20-user load test.

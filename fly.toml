@@ -1,6 +1,6 @@
 # Fly.io app configuration. See docs/features/hosting-fly.md.
-# App names are global on Fly: change `app` to the name you create with `fly apps create`.
-app = "ticket-tracker"
+# App names are global on Fly; "ticket-tracker" was taken, so the app is aleksei-ticket-tracker.
+app = "aleksei-ticket-tracker"
 primary_region = "fra"  # Frankfurt, same city as the Neon database (aws-eu-central-1)
 
 [build]

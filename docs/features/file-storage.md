@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | In progress (local: Live; R2: not yet created) |
+| **Status**   | Live (local: SeaweedFS; production: R2 since 2026-10-15) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
@@ -51,6 +51,13 @@ uploads stay in memory (max 10 MB) on their way to the bucket.
    `S3_REGION=auto` and `S3_ADDRESSING_STYLE=virtual` are already in `fly.toml [env]`.
 6. Smoke test: `fly ssh console -C "python manage.py ensure_bucket"` (without `--create`).
 
+**Verified live on 2026-10-15** (bucket and token created by Aleksei in the Cloudflare
+dashboard):
+- `ensure_bucket`: reachable.
+- Upload from the Fly machine: succeeded.
+- Presigned GET: 200. The same URL after 60 s: **403** (expired). Unsigned GET: 400.
+- Delete: succeeded.
+
 ## Who owns what
 - **Cloudflare account and billing:** Aleksei.
 - **R2 API token:** Fly secrets + password manager. Scope it to the one bucket.
@@ -62,14 +69,18 @@ uploads stay in memory (max 10 MB) on their way to the bucket.
 - **Two endpoints locally.** A presigned URL signs its host, so you can't rewrite
   `storage:8333` to `localhost:8333` afterwards. `S3_PUBLIC_ENDPOINT_URL` makes the storage
   sign with a second client pointed at the browser-facing host. Leave it unset in production.
-- **EU jurisdiction buckets use a different endpoint** (`.eu.` in the hostname). The plain
-  endpoint returns "bucket not found".
+- **EU jurisdiction buckets need the `.eu.` endpoint**
+  (`https://<account_id>.eu.r2.cloudflarestorage.com`).
+  - The plain endpoint returns **403 Forbidden** on every call (`HeadBucket`, `HeadObject`),
+    which looks like a bad token but isn't.
+  - This cost the first deploy on 2026-10-15. It was fixed by changing only
+    `S3_ENDPOINT_URL`.
 - **django-storages 1.14.6 lists Django only up to 5.1** in its classifiers (last release
   2025-04-02). It's verified working on 5.2.18 by `tests/test_storage.py` and a manual
   round-trip on 2026-10-15.
 - **Local anonymous reads return 403** (verified), matching R2's private bucket.
 
 ## Open items
-- [ ] Create the R2 bucket and token, and confirm whether a card is required (2026-10-15).
+- [x] Create the R2 bucket and token (done 2026-10-15).
 - [ ] Phase 1: a permission-checked `/attachments/<comment_id>/` view that redirects to a
   60 s presigned URL with `Content-Disposition: attachment`.

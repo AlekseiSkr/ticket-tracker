@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | In progress (local: Live; production secrets: not yet created) |
+| **Status**   | Live (production secrets set on Fly 2026-10-15) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
@@ -54,7 +54,7 @@ or local disk. Silent fallbacks are a classic production bug, and the brief call
 | `DJANGO_SECRET_KEY` (prod) | Fly secrets + password manager | Aleksei |
 | `DATABASE_URL` (prod) | Fly secrets + password manager | Aleksei (from the Neon console) |
 | `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` (prod) | Fly secrets + password manager | Aleksei (from the R2 API token page) |
-| `GROQ_API_KEY` (Phase 3) | Fly secrets + password manager | Aleksei |
+| `GROQ_API_KEY` (Phase 3) | Password manager now (key created 2026-10-15); Fly secrets once Phase 3 lands | Aleksei |
 | `FLY_API_TOKEN` (CI deploys) | GitHub → repo Settings → Secrets → Actions | Aleksei |
 
 ## Gotchas
@@ -66,5 +66,6 @@ or local disk. Silent fallbacks are a classic production bug, and the brief call
   must also be enabled on the GitHub repo (Settings → Code security).
 
 ## Open items
-- [ ] Create production secrets once Neon, R2 and Fly exist (see their docs).
+- [x] Create production secrets (done 2026-10-15). The Django secret key was generated
+  locally and never displayed.
 - [x] Enable GitHub secret scanning push protection (done 2026-10-15).
