@@ -60,5 +60,5 @@ is what's live.
   not a failure).
 
 ## Open items
-- [x] Push the repo and confirm CI is green (done 2026-10-15, commit `432472c`).
+- [x] Push the repo and confirm CI is green (done 2026-10-15, commit `9676cde`).
 - [ ] Wire up `FLY_API_TOKEN` and `FLY_DEPLOY_ENABLED` after the Fly app exists.

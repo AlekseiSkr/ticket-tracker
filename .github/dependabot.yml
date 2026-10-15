@@ -18,3 +18,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # pyproject pins Python 3.13 (requires-python <3.14); move to 3.14 deliberately.
+      - dependency-name: python
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
