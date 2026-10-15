@@ -1,32 +1,63 @@
 /*
- * Admin theme in the Benrey design language (docs/features/design-language.md).
- * Colours come from UNFOLD["COLORS"] in config/settings.py; this file carries what the
- * colour ramps can't: type, the lime-on-dark buttons, card edges, labels and motion.
- * It is unlayered on purpose: Unfold's Tailwind rules live in cascade layers, so these win
- * without !important even though Unfold loads its stylesheet after this one.
+ * Admin theme in the Benrey design language (DESIGN.md, docs/features/design-language.md).
+ * Colours come from UNFOLD["COLORS"] in config/settings.py; this file carries what the colour
+ * ramps can't: self-hosted type, the lime-on-dark controls, the signature lit line, and the
+ * browser surfaces. It is unlayered on purpose: Unfold's Tailwind rules live in cascade
+ * layers, so these win without !important even though Unfold loads its stylesheet after this.
  */
+
+/* ---- Fonts (OFL, latin subset, variable; licences beside the files) ---------------------- */
+@font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("fonts/geist-latin.woff2") format("woff2"); }
+@font-face { font-family: "Geist Mono"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("fonts/geist-mono-latin.woff2") format("woff2"); }
+/* Archivo at width 125 stands in for the licensed Base Neue Wide / Expanded. */
+@font-face { font-family: "Archivo"; font-style: normal; font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; src: url("fonts/archivo-latin.woff2") format("woff2"); }
+@font-face { font-family: "Archivo"; font-style: italic; font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; src: url("fonts/archivo-italic-latin.woff2") format("woff2"); }
+
+/* ---- Tokens ---------------------------------------------------------------------------- */
 :root {
   --font-sans: "Geist", sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
-  /* Archivo at width 125 stands in for the licensed Base Neue Wide / Expanded. */
   --font-display: "Archivo", sans-serif;
-  --lime-signal: #c3ff00;
-  --lime-ink: #cbfb2e;
+  --lime-signal: #c3ff00;   /* fills */
+  --lime-ink: #cbfb2e;      /* text, lines, light */
   --lime-hover: #dbff66;
-  --khaki: #7b8d72;
-  --ink-black: #0c0c0c;
+  --ink: #060606;           /* page */
+  --panel: #0c0c0c;         /* sidebar, inputs: the second neutral layer */
   --heading: #ebeceb;
+  --muted: #b1b2b0;
+  --subtle: #a3a4a0;   /* 4.5:1+ on the raised greys (#2c2e2c, #343634) */
   --hairline: #232523;
   --divider: #3c3c3c;
-  --moss: #2c362a;
-  --ease-out-cubic: cubic-bezier(.215, .61, .355, 1);
-  --ease-std: cubic-bezier(.4, 0, .2, 1);
+  --edge: #626561;
+  --lit-glow: 0 0 18px 0 var(--lime-ink);  /* the signature lit line */
+  --t-fast: 120ms;
+  --t-base: 180ms;
+  --ease: cubic-bezier(.25, .46, .45, .94);
+  color-scheme: dark;
+  accent-color: var(--lime-signal);
 }
 
-::selection { background: var(--lime-ink); color: #060606; }
+/* ---- Browser surfaces ------------------------------------------------------------------ */
+::selection { background: var(--lime-ink); color: var(--ink); }
+html { scrollbar-color: var(--divider) transparent; }
+input, textarea, [contenteditable] { caret-color: var(--lime-ink); }
+a { text-underline-offset: 3px; text-decoration-thickness: 1px; }
+:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
-/* Type: wide oblique display for headings, Geist Mono for anything functional. */
-h1, #site-name, .unfold-display {
+.skip-link {
+  position: fixed; left: 16px; top: 12px; z-index: 300000;
+  padding: 10px 16px; border-radius: 8px;
+  background: var(--lime-signal); color: var(--panel);
+  font: 600 .875rem/1 var(--font-mono); text-transform: uppercase;
+  transform: translateY(-200%);
+  transition: transform var(--t-base) var(--ease);
+}
+.skip-link:focus-visible { transform: none; }
+
+/* ---- Type: wide oblique for page titles only; Geist for UI; mono for data and labels ---- */
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+#content h1, .dashboard-intro h1, .login h1 span:last-child, #site-name {
   font-family: var(--font-display);
   font-stretch: 125%;
   font-style: italic;
@@ -34,114 +65,116 @@ h1, #site-name, .unfold-display {
   letter-spacing: 0;
   color: var(--heading);
 }
-#content h1, main h1 { font-size: 1.5rem; line-height: 1.33; }
-/* The header breadcrumb is navigation, so it reads as Benrey's mono nav, not a headline. */
+#content h1 { font-size: 1.25rem; line-height: 1.75rem; }
+.login h1 span:last-child { color: var(--lime-ink); }
+
+/* The header breadcrumb is navigation: uppercase mono, as on the source's nav bar. */
 #header-inner h1 {
-  font-family: var(--font-mono);
-  font-stretch: 100%;
-  font-style: normal;
-  font-weight: 400;
-  font-size: .875rem;
-  text-transform: uppercase;
-  color: #fff;
+  font-family: var(--font-mono); font-stretch: 100%; font-style: normal; font-weight: 400;
+  font-size: 1.25rem; text-transform: uppercase; color: #fff;
 }
+#header-inner h1 a { color: var(--muted); font-size: .75rem; transition: color var(--t-fast) var(--ease); }
 #header-inner h1 a:hover { color: var(--lime-ink); }
-h2, h3 { font-family: var(--font-display); font-stretch: 125%; font-weight: 600; color: var(--heading); }
+/* The current page is the page title: display face, one clear step above everything else. */
+#header-inner h1 > a:last-of-type {
+  font-family: var(--font-display); font-stretch: 125%; font-style: italic; font-weight: 800;
+  font-size: 1.25rem; line-height: 1.75rem; text-transform: none; color: var(--heading);
+}
 
-/* Fieldset and inline headings read as Benrey captions: lime mono with a square bullet. */
-:root { accent-color: var(--lime-signal); }
-
-.fieldset > h2, .fieldset h2.font-semibold, [id$="-heading"], fieldset > h2.fieldset-heading {
-  position: relative;
-  padding-left: 16px;
-  font-family: var(--font-mono);
-  font-stretch: 100%;
-  font-size: .75rem;
-  font-weight: 400;
-  line-height: 1.25rem;
-  letter-spacing: .02em;
-  text-transform: uppercase;
+/* Section headings inside forms read as the source's captions: lime mono, square bullet.
+   They are the headings themselves, not labels stacked above one. */
+fieldset.module h2, .fieldset > h2, fieldset > h2.fieldset-heading, [id$="-heading"] {
+  position: relative; padding-left: 16px;
+  font: 400 .75rem/1.25rem var(--font-mono); letter-spacing: .02em; text-transform: uppercase;
   color: var(--lime-ink);
 }
-.fieldset > h2::before, .fieldset h2.font-semibold::before, [id$="-heading"]::before, fieldset > h2.fieldset-heading::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 8px;
-  height: 8px;
-  margin-top: -4px;
+fieldset.module h2::before, .fieldset > h2::before, fieldset > h2.fieldset-heading::before, [id$="-heading"]::before {
+  content: ""; position: absolute; left: 0; top: 50%; width: 8px; height: 8px; margin-top: -4px;
   background: var(--lime-ink);
 }
 [id$="-heading"] { padding-left: 32px; }
 [id$="-heading"]::before { left: 16px; }
 
-/* Labels, table headers, badges and breadcrumbs: uppercase mono. */
-label, thead th, .breadcrumbs, nav[aria-label="Breadcrumb"], .badge, [class*="rounded-full"][class*="text-xs"] {
-  font-family: var(--font-mono);
-  letter-spacing: -.01em;
-}
-thead th { text-transform: uppercase; font-size: .75rem; font-weight: 400; color: #b1b2b0; }
-tbody tr { transition: background-color .2s ease; }
-tbody tr:hover { background-color: rgba(195, 255, 0, .03); }
+label, .breadcrumbs, thead th { font-family: var(--font-mono); letter-spacing: -.01em; }
+label { font-weight: 500; }
 
-/* Buttons: lime fill, near-black text, 8px corners, uppercase mono. */
-.bg-primary-600, button[type="submit"].bg-primary-600, input[type="submit"] {
+/* ---- Data ------------------------------------------------------------------------------ */
+table { font-variant-numeric: tabular-nums; }
+thead th { font-size: .75rem; font-weight: 400; text-transform: uppercase; color: var(--muted); }
+tbody tr { transition: background-color var(--t-fast) var(--ease); }
+tbody tr:hover { background-color: rgba(195, 255, 0, .03); }
+time, .text-xs.text-subtle { font-variant-numeric: tabular-nums; }
+
+/* ---- Controls: rest, hover, active, focus, disabled ------------------------------------- */
+.bg-primary-600, input[type="submit"] {
   background-color: var(--lime-signal);
   border-color: var(--lime-signal);
-  color: var(--ink-black);
-  font-family: var(--font-mono);
-  font-weight: 600;
-  letter-spacing: -.01em;
-  text-transform: uppercase;
-  transition: background-color .2s ease, transform .2s ease, box-shadow .2s ease;
+  color: var(--panel);
+  font-family: var(--font-mono); font-weight: 600; letter-spacing: -.01em; text-transform: uppercase;
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
 }
-.bg-primary-600 .text-white, .bg-primary-600.text-white, .bg-primary-600 .material-symbols-outlined { color: var(--ink-black); }
-.bg-primary-600:hover, input[type="submit"]:hover { background-color: var(--lime-hover); border-color: var(--lime-hover); }
-/* Progress bars and the active-filter pill keep the fill but not the button type. */
+.bg-primary-600 .text-white, .bg-primary-600.text-white, .bg-primary-600 .material-symbols-outlined { color: var(--panel); }
+a.bg-primary-600:hover, button.bg-primary-600:hover, input[type="submit"]:hover { background-color: var(--lime-hover); border-color: var(--lime-hover); }
+a.bg-primary-600:active, button.bg-primary-600:active, input[type="submit"]:active, button:active { transform: scale(.98); }
+button:disabled, input:disabled, select:disabled, textarea:disabled, .bg-primary-600[disabled] {
+  opacity: .45; cursor: not-allowed; transform: none;
+}
+/* Inside the lime action bar, the run button is the source's black square on lime. */
+.bg-primary-900, .bg-primary-600 .bg-primary-900.text-white { background-color: var(--panel); color: var(--lime-ink); }
+.bg-primary-900:hover { background-color: #000; }
+/* Checked checkboxes fill lime, so the tick must be dark. */
+input[type="checkbox"]:checked::after { color: var(--panel); }
+/* Progress bars use the same fill but are not buttons. */
 .h-1\.5.bg-primary-600 { text-transform: none; }
 
-/* Links and the active sidebar item glow lime instead of the default violet. */
-a:hover { text-decoration-color: var(--lime-ink); }
-nav a.active, #nav-sidebar a.active { color: var(--lime-ink); box-shadow: inset 2px 0 0 var(--lime-ink); }
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]), select, textarea {
+  background-color: var(--panel);
+  border-color: var(--divider);
+  transition: border-color var(--t-fast) var(--ease);
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):hover, select:hover, textarea:hover { border-color: var(--edge); }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+/* Switches: Unfold ships them green and without a focus ring; selection is the one accent. */
+/* Switches are the rounded-full ones; plain checkboxes are appearance-none too. */
+input[type="checkbox"].appearance-none.rounded-full:checked { background-color: var(--lime-signal); }
+input[type="checkbox"].appearance-none.rounded-full:checked::after { background-color: var(--panel); }
+::placeholder { color: var(--subtle); }
 
-/* Cards: the conic-gradient edge over a black padding-box, moss warmth on hover. */
-.fieldset, #changelist-form > div > .border, .unfold-card {
-  --card-inner: #000;
+/* ---- Surfaces: the source's conic-gradient card edge, never a drop shadow -------------- */
+/* Top-level containers only: a conic edge inside another reads as nested cards. */
+#content > .fieldset, #content-related {
   border: 1px solid transparent;
   background:
-    linear-gradient(-210deg, #000 20%, var(--card-inner) 100%) padding-box,
+    linear-gradient(#000, #000) padding-box,
     conic-gradient(from 135deg, #666 0deg, #222 90deg, #666 180deg, #222 270deg, #666 1turn) border-box;
   box-shadow: none;
-  transition: filter .5s var(--ease-std);
-}
-.fieldset:hover, .unfold-card:hover { --card-inner: var(--moss); }
-
-/* Inputs: ink-black field, divider border, white focus ring. */
-input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]), select, textarea {
-  background-color: var(--ink-black);
-  border-color: var(--divider);
-}
-input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible {
-  outline: 1px solid #fff;
-  outline-offset: 1px;
 }
 
-/* Header bar: frosted, hairline bottom border. */
-#header, header.sticky, [x-ref="header"] {
-  background-color: rgba(6, 6, 6, .2);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--hairline);
+/* ---- Sidebar: second neutral layer; nav items are the source's timeline ticks ---------- */
+#nav-sidebar-inner { background-color: var(--panel); }
+#nav-sidebar-apps h2, #nav-sidebar-apps h2 * { font: 400 .75rem/1.25rem var(--font-mono); text-transform: uppercase; color: var(--subtle); }
+#nav-sidebar-inner li > a[href] { position: relative; }
+#nav-sidebar-inner li > a[href]::before {
+  content: ""; position: absolute; left: 0; top: 50%; width: 6px; height: 1px;
+  background: var(--divider); opacity: .7;
+  transition: width var(--t-base) var(--ease), background-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
 }
+#nav-sidebar-inner li > a[href]:hover::before { width: 8px; background: var(--edge); opacity: 1; }
+/* The signature move: the current page is the lit line. */
+#nav-sidebar-inner li > a.active::before { width: 10px; background: var(--lime-ink); opacity: 1; box-shadow: var(--lit-glow); }
+#nav-sidebar-inner li > a.active { color: var(--lime-ink); }
 
-/* Motion: content fades up on load (AOS fade-up equivalent, 0.5s ease-out-cubic). */
-@keyframes unfold-fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
-#content, main > .container, #changelist, .fieldset { animation: unfold-fade-up .5s var(--ease-out-cubic) both; }
-.fieldset:nth-of-type(2) { animation-delay: .1s; }
-.fieldset:nth-of-type(3) { animation-delay: .2s; }
-.fieldset:nth-of-type(n+4) { animation-delay: .3s; }
+/* ---- Dashboard greeting ---------------------------------------------------------------- */
+.dashboard-intro { margin: 8px 0 32px; }
+.dashboard-intro h1 { font-size: 2rem; line-height: 1.25; margin-bottom: 8px; }
+.dashboard-meta { position: relative; padding-top: 16px; color: var(--subtle); font: 400 .875rem/1.25rem var(--font-mono); text-transform: uppercase; }
+.dashboard-meta::before { content: ""; position: absolute; left: 0; top: 0; width: 110px; height: 1px; background: var(--lime-ink); box-shadow: var(--lit-glow); }
+
+/* Phones: drop the parent crumbs so the current page title is never truncated. */
+@media (max-width: 767px) {
+  #header-inner h1 > a:not(:last-of-type), #header-inner h1 > .material-symbols-outlined { display: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }

@@ -1,0 +1,39 @@
+{% load static %}<!doctype html>
+{% comment %}Standalone error page: no context processors or database, so 500 still renders.{% endcomment %}
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>{% block title %}{% endblock %} | Ticket Tracker</title>
+<link rel="icon" href="{% static 'core/favicon.svg' %}" type="image/svg+xml">
+<style>
+  @font-face { font-family: "Archivo"; font-style: italic; font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; src: url("{% static 'core/fonts/archivo-italic-latin.woff2' %}") format("woff2"); }
+  @font-face { font-family: "Geist"; font-weight: 100 900; font-display: swap; src: url("{% static 'core/fonts/geist-latin.woff2' %}") format("woff2"); }
+  @font-face { font-family: "Geist Mono"; font-weight: 100 900; font-display: swap; src: url("{% static 'core/fonts/geist-mono-latin.woff2' %}") format("woff2"); }
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; }
+  body { min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: radial-gradient(600px 600px at 70% 25%, #262626, #060606); color: #b8b9b6; font-family: "Geist", sans-serif; font-size: 1rem; line-height: 1.5; }
+  main { width: min(100%, 36rem); }
+  .code { color: #cbfb2e; font-family: "Geist Mono", monospace; font-size: .875rem; line-height: 1.25rem; text-transform: uppercase; }
+  .code { margin-bottom: 24px; }
+  h1 { margin: 0 0 16px; color: #ebeceb; font-family: "Archivo", sans-serif; font-style: italic; font-weight: 800; font-size: 2rem; line-height: 1.25; font-stretch: 125%; text-wrap: balance; }
+  p { max-width: 60ch; }
+  .lit { display: block; width: 110px; height: 1px; margin: 32px 0; background: #cbfb2e; box-shadow: 0 0 18px #cbfb2e; }
+  a.button { display: inline-flex; align-items: center; height: 52px; padding: 4px 18px; border-radius: 8px; background: #c3ff00; color: #0c0c0c; font-family: "Geist Mono", monospace; font-size: 1rem; font-weight: 600; line-height: 1; letter-spacing: -.01em; text-transform: uppercase; text-decoration: none; transition: background-color .15s ease, transform .15s ease; }
+  a.button:hover { background: #dbff66; }
+  a.button:active { transform: scale(.98); }
+  a.button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  ::selection { background: #cbfb2e; color: #060606; }
+</style>
+</head>
+<body>
+<main>
+  <h1>{% block heading %}{% endblock %}</h1>
+  <p>{% block message %}{% endblock %}</p>
+  <span class="lit" aria-hidden="true"></span>
+  <p class="code">{% block code %}{% endblock %}</p>
+  <a class="button" href="/admin/">Back to the admin</a>
+</main>
+</body>
+</html>

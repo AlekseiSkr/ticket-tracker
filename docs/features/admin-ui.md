@@ -47,12 +47,15 @@ No credentials.
   Mount the AI chat with `change_form_outer_after_template` or `UNFOLD["SCRIPTS"]`.
 - **Custom `UNFOLD["SIDEBAR"]` items are visible by default.** Every custom item needs a
   `permission` callback, or keep the auto-generated, permission-aware sidebar.
-- **Re-register `User` and `Group` with Unfold's admin classes**, or those pages render in
-  the stock style.
+- **`User` and `Group` are re-registered with Unfold's admin classes** in `core/admin.py`.
+  Without that they render in the stock style. Phase 1 role restrictions extend those classes.
+- **Don't enable `UNFOLD["COMMAND"]["search_models"]`.** It lists `str(obj)` for every searchable
+  model, which would bypass per-role field hiding.
 - **Tests run with `DEBUG=False`**, so they use plain static storage
   (`tests/conftest.py`). The manifest storage would fail without `collectstatic`.
 
 ## Open items
 - [ ] Phase 1: Ticket, Customer, Agent and Tag admins, Comment inline, bulk actions, role
   restrictions.
-- [ ] Phase 6 (optional): role-aware dashboard (tickets by status, SLA breaches, agent load).
+- [ ] Phase 6 (optional): role-aware dashboard (tickets by status, SLA breaches, agent load),
+  added to `templates/admin/index.html` below the greeting.

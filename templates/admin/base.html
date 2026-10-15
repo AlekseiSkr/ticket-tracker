@@ -1,0 +1,8 @@
+{% extends "admin/base.html" %}
+{% comment %}Extends Unfold's admin/base.html (the next loader) to add a skip link as the first focusable element.{% endcomment %}
+{% load i18n %}
+
+{% block base %}
+    <a class="skip-link" href="#content">{% translate "Skip to main content" %}</a>
+    {{ block.super }}
+{% endblock %}

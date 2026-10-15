@@ -1,0 +1,38 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "templates/_error.html"
+        ],
+        "createdAt": "2026-10-15T21:12:02.888Z",
+        "reason": "Signature move of the captured benrey.io world: the lit line's 0 0 18px #cbfb2e glow (DESIGN.md, Elevation & Depth). Claude's decision from the measured source; the user delegated design choices."
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "core/static/core/theme.css"
+        ],
+        "createdAt": "2026-10-15T21:21:08.484Z",
+        "reason": "Signature move of the captured benrey.io world: the lit line's 0 0 18px #cbfb2e glow marks the active nav item and the dashboard rule (DESIGN.md). Claude's decision from the measured source; the user delegated design choices."
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist",
+        "createdAt": "2026-10-15T21:27:27.543Z",
+        "reason": "Geist and Geist Mono are the faces measured on benrey.io (the captured world's body and label fonts, DESIGN.md Typography). Claude's decision from the measured source; the user delegated design choices."
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist mono",
+        "createdAt": "2026-10-15T21:27:27.998Z",
+        "reason": "Geist Mono is the label face measured on benrey.io (DESIGN.md Typography). Claude's decision from the measured source; the user delegated design choices."
+      }
+    ]
+  }
+}

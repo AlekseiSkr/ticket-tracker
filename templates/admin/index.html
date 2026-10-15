@@ -1,0 +1,11 @@
+{% extends "admin/index.html" %}
+{% comment %}Unfold's dashboard (app list + recent actions) under a short greeting.{% endcomment %}
+{% load i18n %}
+
+{% block content %}
+    <section class="dashboard-intro" aria-labelledby="dashboard-title">
+        <h1 id="dashboard-title">{% blocktranslate with name=request.user.get_short_name|default:request.user.get_username %}Welcome back, {{ name }}.{% endblocktranslate %}</h1>
+        <p class="dashboard-meta"><time datetime="{% now 'Y-m-d' %}">{% now "l j F Y" %}</time></p>
+    </section>
+    {{ block.super }}
+{% endblock %}

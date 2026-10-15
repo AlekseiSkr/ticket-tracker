@@ -12,7 +12,7 @@
 
 ## What
 Infrastructure that isn't part of the ticket domain: the health/readiness middleware,
-operational management commands and the admin theme stylesheet. It has no models.
+operational management commands, the auth admin registrations and the admin theme. It has no models.
 
 ## Why
 This keeps `tickets/` purely about the domain, so ops code and business rules don't mix.
@@ -25,7 +25,9 @@ This keeps `tickets/` purely about the domain, so ops code and business rules do
 | `apps.py` | `CoreConfig`. |
 | `middleware.py` | `HealthCheckMiddleware` answers `/healthz` (liveness, zero DB queries) and `/readyz` (`SELECT 1`, 503 if the DB is down) before host validation and the HTTPS redirect. |
 | `management/` | Operational commands (see [management/README.md](management/README.md)). |
-| `static/core/` | `theme.css`, the admin's Benrey design language (see [static/core/README.md](static/core/README.md)). |
+| `admin.py` | `User` and `Group` re-registered with Unfold's admin classes and forms. |
+| `admin_ui.py` | Callbacks for `settings.UNFOLD` (the "Local" environment badge). |
+| `static/core/` | Theme assets: `theme.css`, self-hosted fonts, favicon, login art (see [static/core/README.md](static/core/README.md)). |
 
 Tests: `tests/test_health.py` and `tests/test_ensure_bucket.py`.
 
