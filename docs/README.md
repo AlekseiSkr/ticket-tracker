@@ -32,7 +32,7 @@ nobody reads because it's long is worse than no doc):
 | `docker/` | Config for local compose services | Live | [docker/README.md](../docker/README.md) |
 | `docker/seaweedfs/` | Local S3 emulator identities | Live | [docker/seaweedfs/README.md](../docker/seaweedfs/README.md) |
 | `.github/` | Dependabot, repo automation | Live | [.github/README.md](../.github/README.md) |
-| `.github/workflows/` | CI and deploy pipelines | CI Live, deploy Planned | [.github/workflows/README.md](../.github/workflows/README.md) |
+| `.github/workflows/` | CI and deploy pipelines | Live | [.github/workflows/README.md](../.github/workflows/README.md) |
 
 The root is covered by [../README.md](../README.md) (run it) and [../CLAUDE.md](../CLAUDE.md) (working rules).
 
@@ -46,7 +46,7 @@ The root is covered by [../README.md](../README.md) (run it) and [../CLAUDE.md](
 | Database (Postgres / Neon Frankfurt) | Live | [database.md](features/database.md) |
 | File storage (SeaweedFS / Cloudflare R2 EU) | Live | [file-storage.md](features/file-storage.md) |
 | Admin UI (Django admin + Unfold) | In progress | [admin-ui.md](features/admin-ui.md) |
-| CI/CD (GitHub Actions) | In progress (CI Live) | [ci-cd.md](features/ci-cd.md) |
+| CI/CD (GitHub Actions → Fly) | Live | [ci-cd.md](features/ci-cd.md) |
 | Hosting (Fly.io, aleksei-ticket-tracker.fly.dev) | Live | [hosting-fly.md](features/hosting-fly.md) |
 | Authentication and roles | Planned | [authentication-and-roles.md](features/authentication-and-roles.md) |
 | AI form assistant (Groq) | Planned | [ai-form-assistant.md](features/ai-form-assistant.md) |

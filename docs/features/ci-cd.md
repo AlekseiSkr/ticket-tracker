@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | In progress (CI: Live, green since 2026-10-15; deploy: waiting on the Fly app) |
+| **Status**   | Live (CI green since 2026-10-15; auto-deploy to Fly enabled 2026-10-15) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
@@ -36,11 +36,15 @@ is what's live.
    `gh repo create AlekseiSkr/ticket-tracker --public --source . --push`.
 2. Secret scanning, push protection and Dependabot alerts were enabled on 2026-10-15 via the
    GitHub API (equivalent to repo **Settings → Code security**).
-3. Once the Fly app exists (see [hosting-fly.md](hosting-fly.md)):
-   - `fly tokens create deploy -x 999999h`, then add it as the Actions secret `FLY_API_TOKEN`
-     (Settings → Secrets and variables → Actions).
-   - Add the Actions **variable** `FLY_DEPLOY_ENABLED=true`.
-   - Create a `production` environment (Settings → Environments).
+3. Auto-deploy, enabled on 2026-10-15:
+   - Created a **deploy-scoped** token, valid for 1 year, named `github-actions-deploy`, and
+     piped it straight into the repo secret without displaying it:
+     `fly tokens create deploy -a aleksei-ticket-tracker -x 8760h -n github-actions-deploy | gh secret set FLY_API_TOKEN`
+   - Set the Actions variable: `gh variable set FLY_DEPLOY_ENABLED --body true`.
+   - The `production` environment is created automatically the first time the deploy job
+     runs.
+   - **Verified:** a manual dispatch of Deploy (run 38788295485) succeeded, and the release
+     migration and machine update went through.
 
 ## Who owns what
 - **GitHub repo:** Aleksei.
@@ -64,4 +68,6 @@ is what's live.
 
 ## Open items
 - [x] Push the repo and confirm CI is green (done 2026-10-15, commit `9676cde`).
-- [ ] Wire up `FLY_API_TOKEN` and `FLY_DEPLOY_ENABLED` after the Fly app exists.
+- [x] Wire up `FLY_API_TOKEN` and `FLY_DEPLOY_ENABLED` (done 2026-10-15).
+- [ ] **Rotate `FLY_API_TOKEN` before 2027-10-15**, when it expires.
+  List and revoke tokens with `fly tokens list -a aleksei-ticket-tracker`.

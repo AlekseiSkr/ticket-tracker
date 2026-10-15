@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | CI: Live. Deploy: Planned (disabled until the Fly app exists). |
+| **Status**   | Live (CI and auto-deploy to Fly, enabled 2026-10-15) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
@@ -41,4 +41,5 @@ Placeholder env values for settings are at the top of `ci.yml`. They're not secr
   2026-10-15). Dependabot bumps them.
 
 ## Open items
-- [ ] Enable deploy: create the Fly app, add `FLY_API_TOKEN`, set `FLY_DEPLOY_ENABLED=true`.
+- [x] Enable deploy (done 2026-10-15). Token rotation is tracked in
+  [../../docs/features/ci-cd.md](../../docs/features/ci-cd.md).
