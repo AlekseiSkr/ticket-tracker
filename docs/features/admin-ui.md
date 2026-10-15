@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | In progress (theme installed; ticket admin comes in Phase 1) |
+| **Status**   | In progress (theme installed and styled; ticket admin comes in Phase 1) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
@@ -35,6 +35,9 @@ restrictions. Unfold is a skin on top of these, not a replacement.
 - Pinned exactly (`django-unfold==0.110.0`) because it's 0.x and releases weekly.
 - Core behaviour (actions, inlines, permissions) uses **stock Django APIs**, so removing
   Unfold is a mixin swap.
+- The look (dark only, lime accent, wide oblique headings) is set through `UNFOLD`
+  (`THEME`, `COLORS`, `STYLES`) plus `core/static/core/theme.css`. See
+  [design-language.md](design-language.md).
 
 ## Who owns what
 No credentials.

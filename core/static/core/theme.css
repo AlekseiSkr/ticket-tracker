@@ -1,0 +1,147 @@
+/*
+ * Admin theme in the Benrey design language (docs/features/design-language.md).
+ * Colours come from UNFOLD["COLORS"] in config/settings.py; this file carries what the
+ * colour ramps can't: type, the lime-on-dark buttons, card edges, labels and motion.
+ * It is unlayered on purpose: Unfold's Tailwind rules live in cascade layers, so these win
+ * without !important even though Unfold loads its stylesheet after this one.
+ */
+:root {
+  --font-sans: "Geist", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  /* Archivo at width 125 stands in for the licensed Base Neue Wide / Expanded. */
+  --font-display: "Archivo", sans-serif;
+  --lime-signal: #c3ff00;
+  --lime-ink: #cbfb2e;
+  --lime-hover: #dbff66;
+  --khaki: #7b8d72;
+  --ink-black: #0c0c0c;
+  --heading: #ebeceb;
+  --hairline: #232523;
+  --divider: #3c3c3c;
+  --moss: #2c362a;
+  --ease-out-cubic: cubic-bezier(.215, .61, .355, 1);
+  --ease-std: cubic-bezier(.4, 0, .2, 1);
+}
+
+::selection { background: var(--lime-ink); color: #060606; }
+
+/* Type: wide oblique display for headings, Geist Mono for anything functional. */
+h1, #site-name, .unfold-display {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: 0;
+  color: var(--heading);
+}
+#content h1, main h1 { font-size: 1.5rem; line-height: 1.33; }
+/* The header breadcrumb is navigation, so it reads as Benrey's mono nav, not a headline. */
+#header-inner h1 {
+  font-family: var(--font-mono);
+  font-stretch: 100%;
+  font-style: normal;
+  font-weight: 400;
+  font-size: .875rem;
+  text-transform: uppercase;
+  color: #fff;
+}
+#header-inner h1 a:hover { color: var(--lime-ink); }
+h2, h3 { font-family: var(--font-display); font-stretch: 125%; font-weight: 600; color: var(--heading); }
+
+/* Fieldset and inline headings read as Benrey captions: lime mono with a square bullet. */
+:root { accent-color: var(--lime-signal); }
+
+.fieldset > h2, .fieldset h2.font-semibold, [id$="-heading"], fieldset > h2.fieldset-heading {
+  position: relative;
+  padding-left: 16px;
+  font-family: var(--font-mono);
+  font-stretch: 100%;
+  font-size: .75rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--lime-ink);
+}
+.fieldset > h2::before, .fieldset h2.font-semibold::before, [id$="-heading"]::before, fieldset > h2.fieldset-heading::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  background: var(--lime-ink);
+}
+[id$="-heading"] { padding-left: 32px; }
+[id$="-heading"]::before { left: 16px; }
+
+/* Labels, table headers, badges and breadcrumbs: uppercase mono. */
+label, thead th, .breadcrumbs, nav[aria-label="Breadcrumb"], .badge, [class*="rounded-full"][class*="text-xs"] {
+  font-family: var(--font-mono);
+  letter-spacing: -.01em;
+}
+thead th { text-transform: uppercase; font-size: .75rem; font-weight: 400; color: #b1b2b0; }
+tbody tr { transition: background-color .2s ease; }
+tbody tr:hover { background-color: rgba(195, 255, 0, .03); }
+
+/* Buttons: lime fill, near-black text, 8px corners, uppercase mono. */
+.bg-primary-600, button[type="submit"].bg-primary-600, input[type="submit"] {
+  background-color: var(--lime-signal);
+  border-color: var(--lime-signal);
+  color: var(--ink-black);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  transition: background-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.bg-primary-600 .text-white, .bg-primary-600.text-white, .bg-primary-600 .material-symbols-outlined { color: var(--ink-black); }
+.bg-primary-600:hover, input[type="submit"]:hover { background-color: var(--lime-hover); border-color: var(--lime-hover); }
+/* Progress bars and the active-filter pill keep the fill but not the button type. */
+.h-1\.5.bg-primary-600 { text-transform: none; }
+
+/* Links and the active sidebar item glow lime instead of the default violet. */
+a:hover { text-decoration-color: var(--lime-ink); }
+nav a.active, #nav-sidebar a.active { color: var(--lime-ink); box-shadow: inset 2px 0 0 var(--lime-ink); }
+
+/* Cards: the conic-gradient edge over a black padding-box, moss warmth on hover. */
+.fieldset, #changelist-form > div > .border, .unfold-card {
+  --card-inner: #000;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(-210deg, #000 20%, var(--card-inner) 100%) padding-box,
+    conic-gradient(from 135deg, #666 0deg, #222 90deg, #666 180deg, #222 270deg, #666 1turn) border-box;
+  box-shadow: none;
+  transition: filter .5s var(--ease-std);
+}
+.fieldset:hover, .unfold-card:hover { --card-inner: var(--moss); }
+
+/* Inputs: ink-black field, divider border, white focus ring. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]), select, textarea {
+  background-color: var(--ink-black);
+  border-color: var(--divider);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 1px solid #fff;
+  outline-offset: 1px;
+}
+
+/* Header bar: frosted, hairline bottom border. */
+#header, header.sticky, [x-ref="header"] {
+  background-color: rgba(6, 6, 6, .2);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* Motion: content fades up on load (AOS fade-up equivalent, 0.5s ease-out-cubic). */
+@keyframes unfold-fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+#content, main > .container, #changelist, .fieldset { animation: unfold-fade-up .5s var(--ease-out-cubic) both; }
+.fieldset:nth-of-type(2) { animation-delay: .1s; }
+.fieldset:nth-of-type(3) { animation-delay: .2s; }
+.fieldset:nth-of-type(n+4) { animation-delay: .3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
