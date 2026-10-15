@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Live (16 tests passing on 2026-10-15) |
+| **Status**   | Live (17 tests passing on 2026-10-15) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
@@ -31,6 +31,7 @@ invariants.
 | `conftest.py` | Autouse fixture: plain static storage, because tests run with `DEBUG=False` and no `collectstatic`. |
 | `test_env.py` | `require_env` and the other helpers fail loudly on missing or invalid values. |
 | `test_health.py` | `/healthz` makes zero queries; `/readyz` up and 503; the admin login page renders. |
+| `test_admin_theme.py` | The admin renders dark, with the lime primary colour, the fonts and `core/theme.css`. |
 | `test_storage.py` | URLs are presigned (60 s); the public endpoint is used when set. |
 | `test_ensure_bucket.py` | Creates the bucket only on a 404 with `--create`; never on 403. |
 

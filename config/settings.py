@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import dj_database_url
+from django.templatetags.static import static
 
 from config.env import env_bool, env_int, env_list, optional_env, require_env
 
@@ -143,10 +144,53 @@ LOGGING = {
 }
 
 # --- Admin theme (Unfold) -----------------------------------------------------
+# Benrey design language (docs/features/design-language.md): dark only, one lime accent.
 UNFOLD = {
     "SITE_TITLE": "Ticket Tracker",
     "SITE_HEADER": "Ticket Tracker",
     "SITE_SYMBOL": "support_agent",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": False,
+    "THEME": "dark",
+    "BORDER_RADIUS": "8px",
+    "COLORS": {
+        # Dark mode paints the page with 900 and borders with 800/700.
+        "base": {
+            "50": "#f5f5f4",
+            "100": "#ebeceb",
+            "200": "#d2d3d1",
+            "300": "#b8b9b6",
+            "400": "#b1b2b0",
+            "500": "#868783",
+            "600": "#626561",
+            "700": "#3c3c3c",
+            "800": "#232523",
+            "900": "#060606",
+            "950": "#000000",
+        },
+        # 600 fills buttons (lime signal); 500 is the dark-mode text accent (lime ink).
+        "primary": {
+            "50": "#fbffef",
+            "100": "#f6ffd9",
+            "200": "#efffb8",
+            "300": "#e6ff8f",
+            "400": "#dbff66",
+            "500": "#cbfb2e",
+            "600": "#c3ff00",
+            "700": "#a3d600",
+            "800": "#7a9f00",
+            "900": "#536c00",
+            "950": "#2c362a",
+        },
+        "font": {
+            "subtle-dark": "#868783",
+            "default-dark": "#b8b9b6",
+            "important-dark": "#ebeceb",
+        },
+    },
+    "STYLES": [
+        "https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,125,500..900;1,125,700..900"
+        "&family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap",
+        lambda request: static("core/theme.css"),
+    ],
 }
