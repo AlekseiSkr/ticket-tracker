@@ -4,6 +4,13 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Deliberately on the Django 5.2 LTS (support to 2028-04); django-storages has no
+      # released 6.x support yet. Only patch releases come through automatically.
+      - dependency-name: django
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: django-stubs
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
     groups:
       python:
         patterns: ["*"]
