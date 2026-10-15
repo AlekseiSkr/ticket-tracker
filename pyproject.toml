@@ -9,7 +9,7 @@ dependencies = [
     "django-unfold==0.110.0",          # 0.x and releases weekly, so pin exactly
     "django-storages[s3]>=1.14.6,<1.15",
     "dj-database-url>=3.0",
-    "psycopg[binary]>=3.2",
+    "psycopg[binary]>=3.3.6",
     "whitenoise>=6.12",
     "argon2-cffi>=23.1",
     "gunicorn>=23.0",
@@ -22,7 +22,7 @@ dev = [
     "pytest-cov>=6.0",
     "ruff>=0.13",
     "mypy>=1.18",
-    "django-stubs[compatible-mypy]>=5.2,<5.3",  # stubs track the Django minor version
+    "django-stubs[compatible-mypy]>=6.1.2,<6.2",  # stubs track the Django minor version
 ]
 
 [tool.uv]
