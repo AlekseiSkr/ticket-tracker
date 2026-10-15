@@ -1,0 +1,28 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Django
+staticfiles/
+media/
+
+# Private planning material copied from the planning session (contains the
+# assignment's internal grading notes; never publish).
+takehome/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
