@@ -5,6 +5,9 @@
 - **Every new feature ships with a doc** in `docs/features/`, copied from
   `docs/_template.md`. When reality changes, update the doc's `Status` and `Updated` fields,
   and add it to the index in `docs/README.md`.
+- **No AI attribution in git.** Commits and PRs go out under the owner's identity only:
+  no `Co-Authored-By: Claude` trailer, no Claude author, no "Generated with Claude Code"
+  line.
 - **Never commit secrets.** Docs say where a credential lives, never its value. Use absolute
   dates (YYYY-MM-DD). Record the rejected option in every decision.
 - **Configuration comes from env vars via `config/env.py`.** Never add a silent fallback
