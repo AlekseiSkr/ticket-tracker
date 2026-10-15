@@ -78,6 +78,9 @@ To rebuild from nothing, the steps are:
 
 ## Open items
 - [x] Create the Fly account and app (done 2026-10-15).
-- [ ] Create the first admin user: `fly ssh console -a aleksei-ticket-tracker -C "python manage.py createsuperuser"`.
+- [x] Create the first admin user (done 2026-10-15 by Aleksei; password in the password
+  manager). The command needs `--pty`:
+  `fly ssh console -a aleksei-ticket-tracker --pty -C "python manage.py createsuperuser"`.
+  Without `--pty`, Django skips the prompts with "not running in a TTY".
 - [ ] Spike S1: warm changelist p50 ≤ 400 ms from the EU, first request after Neon idle ≤ 2 s.
 - [ ] Spike S9: gunicorn RSS < 400 MB under a 20-user load test.
