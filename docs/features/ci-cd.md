@@ -56,8 +56,11 @@ is what's live.
 - **CI runs with `DJANGO_DEBUG` unset**, which means production security settings, so plain
   HTTP requests in tests get a 301 to HTTPS. Use `client.get(..., secure=True)`. This was
   the first CI failure, on 2026-10-15.
-- **gitleaks-action@v2 targets Node 20**, which GitHub now forces onto Node 24 (a warning,
-  not a failure).
+- **Dependabot is told to ignore** Django and django-stubs minor/major bumps, and Python
+  base-image minor/major bumps. The project stays on Django 5.2 LTS and Python 3.13 on
+  purpose. On 2026-10-15 Dependabot opened PR #3, widening the pin to Django 6.1; it was
+  closed by the ignore rule. Upgrade those deliberately, in their own PR.
+- **On 2026-10-15 PR #2 moved Actions** to `checkout@v7`, `setup-uv@v7` and `gitleaks@v3`.
 
 ## Open items
 - [x] Push the repo and confirm CI is green (done 2026-10-15, commit `9676cde`).
