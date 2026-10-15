@@ -1,7 +1,13 @@
 # Docs
 
-Every feature gets one short doc in [features/](features/), copied from [_template.md](_template.md).
-Keep each one short; a doc nobody reads because it's long is worse than no doc.
+Two kinds of doc, both copied from [_template.md](_template.md) and kept short (a doc
+nobody reads because it's long is worse than no doc):
+
+- **Directory docs:** a `README.md` in **every directory that holds code or config**. It
+  says what the directory does, why it's built that way, how its files fit together, and
+  what to watch out for, so any person or agent can get up to speed on that folder alone.
+- **Feature docs:** one per feature or external service in [features/](features/), covering
+  accounts, setup steps and cross-cutting decisions.
 
 ## Rules
 
@@ -12,7 +18,25 @@ Keep each one short; a doc nobody reads because it's long is worse than no doc.
 - **Update `Status` and `Updated` when reality changes.** A doc that says Live about
   something dead is worse than nothing.
 
-## Index
+## Directory index
+
+| Directory | What's there | Status | Doc |
+|---|---|---|---|
+| `config/` | Settings, env helpers, S3 storage backend, URLs, WSGI/ASGI | Live | [config/README.md](../config/README.md) |
+| `core/` | Health/readiness middleware, ops infrastructure | Live | [core/README.md](../core/README.md) |
+| `core/management/` | Management-command package | Live | [core/management/README.md](../core/management/README.md) |
+| `core/management/commands/` | `ensure_bucket` | Live | [core/management/commands/README.md](../core/management/commands/README.md) |
+| `tickets/` | Ticket domain: models, rules, admin | Planned (Phase 1) | [tickets/README.md](../tickets/README.md) |
+| `tickets/migrations/` | Generated migrations, roles data migration | Planned (Phase 1) | [tickets/migrations/README.md](../tickets/migrations/README.md) |
+| `tests/` | pytest-django suite | Live | [tests/README.md](../tests/README.md) |
+| `docker/` | Config for local compose services | Live | [docker/README.md](../docker/README.md) |
+| `docker/seaweedfs/` | Local S3 emulator identities | Live | [docker/seaweedfs/README.md](../docker/seaweedfs/README.md) |
+| `.github/` | Dependabot, repo automation | Live | [.github/README.md](../.github/README.md) |
+| `.github/workflows/` | CI and deploy pipelines | CI Live, deploy Planned | [.github/workflows/README.md](../.github/workflows/README.md) |
+
+The root is covered by [../README.md](../README.md) (run it) and [../CLAUDE.md](../CLAUDE.md) (working rules).
+
+## Feature index
 
 | Feature | Status | Doc |
 |---|---|---|

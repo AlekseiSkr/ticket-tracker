@@ -2,9 +2,14 @@
 
 - **Run everything through Docker:** `docker compose exec web <cmd>` (pytest, ruff, mypy,
   manage.py). The host Python is not used.
-- **Every new feature ships with a doc** in `docs/features/`, copied from
-  `docs/_template.md`. When reality changes, update the doc's `Status` and `Updated` fields,
-  and add it to the index in `docs/README.md`.
+- **Start in a folder by reading its `README.md`.** Every directory that holds code or
+  config has one (template: `docs/_template.md`).
+  - **New directory:** add its README and list it in the directory index in
+    `docs/README.md`.
+  - **Changed what's in a directory:** update that README in the same commit, including its
+  `Status` and `Updated` fields.
+- **Every new feature or external service ships with a doc** in `docs/features/`, also
+  copied from `docs/_template.md` and listed in the feature index in `docs/README.md`.
 - **No AI attribution in git.** Commits and PRs go out under the owner's identity only:
   no `Co-Authored-By: Claude` trailer, no Claude author, no "Generated with Claude Code"
   line.
