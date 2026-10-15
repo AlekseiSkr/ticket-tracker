@@ -1,0 +1,58 @@
+# Local development stack. Mirrors production shape: Postgres + S3-compatible storage,
+# no SQLite and no local-disk media. Ports bind to 127.0.0.1 only.
+name: ticket-tracker
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: tickets
+      POSTGRES_USER: tickets
+      POSTGRES_PASSWORD: tickets
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tickets -d tickets"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  storage:
+    # SeaweedFS stands in for Cloudflare R2 locally (MinIO's community edition was
+    # archived in 2026). One identity (local/local) is configured so anonymous reads
+    # are refused, matching R2's private bucket.
+    image: chrislusf/seaweedfs:4.48
+    command: >
+      server -s3 -s3.config=/etc/seaweedfs/s3.json -dir=/data -ip.bind=0.0.0.0
+      -volume.max=0 -master.volumeSizeLimitMB=256
+    ports:
+      - "127.0.0.1:8333:8333"
+    volumes:
+      - s3data:/data
+      - ./docker/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+
+  web:
+    build:
+      context: .
+      target: dev
+    env_file: .env
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py ensure_bucket --create &&
+             python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      storage:
+        condition: service_started
+    restart: on-failure
+
+volumes:
+  pgdata:
+  s3data:

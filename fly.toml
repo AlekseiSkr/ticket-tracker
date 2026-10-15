@@ -1,0 +1,37 @@
+# Fly.io app configuration. See docs/features/hosting-fly.md.
+# App names are global on Fly: change `app` to the name you create with `fly apps create`.
+app = "ticket-tracker"
+primary_region = "fra"  # Frankfurt, same city as the Neon database (aws-eu-central-1)
+
+[build]
+  build-target = "prod"
+
+[deploy]
+  # Runs in a temporary machine before the new release goes live.
+  # A failing migration aborts the deploy and the old release keeps serving.
+  release_command = "python manage.py migrate --noinput"
+  strategy = "rolling"
+
+[env]
+  DJANGO_DEBUG = "false"
+  LOG_LEVEL = "INFO"
+  S3_REGION = "auto"
+  S3_ADDRESSING_STYLE = "virtual"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "off"   # always on: no cold starts for reviewers
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "15s"
+    interval = "30s"
+    method = "GET"
+    path = "/healthz"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
