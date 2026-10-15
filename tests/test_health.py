@@ -28,5 +28,6 @@ def test_readyz_returns_503_when_database_is_down(client):
 
 @pytest.mark.django_db
 def test_admin_login_page_renders(client):
-    response = client.get("/admin/login/")
+    # secure=True: with DJANGO_DEBUG off (CI, production) plain HTTP is redirected to HTTPS.
+    response = client.get("/admin/login/", secure=True)
     assert response.status_code == 200
