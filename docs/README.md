@@ -22,7 +22,7 @@ Keep each one short; a doc nobody reads because it's long is worse than no doc.
 | Database (Postgres / Neon) | In progress | [database.md](features/database.md) |
 | File storage (SeaweedFS / Cloudflare R2) | In progress | [file-storage.md](features/file-storage.md) |
 | Admin UI (Django admin + Unfold) | In progress | [admin-ui.md](features/admin-ui.md) |
-| CI/CD (GitHub Actions) | In progress | [ci-cd.md](features/ci-cd.md) |
+| CI/CD (GitHub Actions) | In progress (CI Live) | [ci-cd.md](features/ci-cd.md) |
 | Hosting (Fly.io) | Planned | [hosting-fly.md](features/hosting-fly.md) |
 | Authentication and roles | Planned | [authentication-and-roles.md](features/authentication-and-roles.md) |
 | AI form assistant (Groq) | Planned | [ai-form-assistant.md](features/ai-form-assistant.md) |
