@@ -1,5 +1,7 @@
 # Working on this repo
 
+- **Write all code with the `/ponytail:ponytail` skill:** the smallest complete change, no
+  speculative abstractions or options, every non-trivial piece of logic with a test.
 - **Run everything through Docker:** `docker compose exec web <cmd>` (pytest, ruff, mypy,
   manage.py). The host Python is not used.
 - **Start in a folder by reading its `README.md`.** Every directory that holds code or

@@ -40,7 +40,8 @@ or local disk. Silent fallbacks are a classic production bug, and the brief call
   - `DB_CONN_MAX_AGE` (default 60)
   - `LOG_LEVEL`
 - **Command-only variables** (read by `seed_users`, not by the app at startup):
-  - `DEMO_LEAD_PASSWORD`, `DEMO_AGENT_PASSWORD`. Required when the command runs, and they must
+  - `DEMO_LEAD_1_PASSWORD`, `DEMO_AGENT_1_PASSWORD`, `DEMO_LEAD_2_PASSWORD`,
+    `DEMO_AGENT_2_PASSWORD` (one per reviewer account). Required when the command runs, and they must
     pass Django's password validators.
 - **Local:** `.env`, copied from `.env.example`.
 - **CI:** placeholder values in `.github/workflows/ci.yml` (`env:`). They are not secrets.
@@ -57,7 +58,7 @@ or local disk. Silent fallbacks are a classic production bug, and the brief call
 | `DJANGO_SECRET_KEY` (prod) | Fly secrets + password manager | Aleksei |
 | `DATABASE_URL` (prod) | Fly secrets + password manager | Aleksei (from the Neon console) |
 | `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` (prod) | Fly secrets + password manager | Aleksei (from the R2 API token page) |
-| `DEMO_LEAD_PASSWORD` / `DEMO_AGENT_PASSWORD` (prod) | Fly secrets + password manager; sent to reviewers privately | Aleksei |
+| `DEMO_LEAD_1_PASSWORD`, `DEMO_AGENT_1_PASSWORD`, `DEMO_LEAD_2_PASSWORD`, `DEMO_AGENT_2_PASSWORD` (prod) | Fly secrets + password manager; sent to reviewers privately | Aleksei |
 | `GROQ_API_KEY` (Phase 3) | Password manager now (key created 2026-10-15); Fly secrets once Phase 3 lands | Aleksei |
 | `FLY_API_TOKEN` (CI deploys) | GitHub → repo Settings → Secrets → Actions | Aleksei |
 

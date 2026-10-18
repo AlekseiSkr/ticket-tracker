@@ -5,7 +5,7 @@
 | **Status**   | Live |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | `config/` (the Django project package; `DJANGO_SETTINGS_MODULE=config.settings`) |
 | **Cost**     | $0 |
 | **Depends on** | [../docs/features/configuration-and-secrets.md](../docs/features/configuration-and-secrets.md), [../docs/features/file-storage.md](../docs/features/file-storage.md) |
@@ -51,4 +51,4 @@ secrets (production).
   `client_config`). Re-run `tests/test_storage.py` after upgrading django-storages.
 
 ## Open items
-- [ ] Phase 3: `LLM_BASE_URL`, `LLM_MODEL`, `GROQ_API_KEY`. Phase 4: allauth settings. Phase 5: CSP, Sentry.
+- [ ] Phase 3: `LLM_BASE_URL`, `LLM_MODEL`, `GROQ_API_KEY`. Phase 5: CSP, Sentry, admin login rate limit. (Phase 4 OAuth was dropped on 2026-10-18.)

@@ -209,7 +209,7 @@ class Command(BaseCommand):
             for i in range(25)
         )
         Agent.objects.bulk_create(Agent(user=u, team=rng.choice(Agent.Team.values)) for u in users)
-        agents = list(Agent.objects.select_related("user"))  # includes seed_users' demo accounts
+        agents = list(Agent.objects.select_related("user"))  # includes the reviewer accounts
 
         customers = Customer.objects.bulk_create(
             (
