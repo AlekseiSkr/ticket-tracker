@@ -4,8 +4,9 @@ A support ticket tracker built on the Django admin: customers, agents, tickets w
 workflow and SLA, comments with attachments, role-based access, and an AI assistant that
 explains the admin forms.
 
-> Status: Phase 0 (skeleton) is done. The full README (architecture decisions, why this
-> stack, what was skipped) is written in Phase 5. The plan is in [docs/plan.md](docs/plan.md).
+> Status: Phase 1 (core, v0.1) is done: tickets, workflow rules, roles, attachments and demo
+> data. The full README (architecture decisions, why this stack, what was skipped) is written
+> in Phase 5. The plan is in [docs/plan.md](docs/plan.md).
 
 ## Run it locally
 
@@ -15,6 +16,9 @@ Requires Docker Desktop.
 cp .env.example .env
 docker compose up -d --build
 docker compose exec web python manage.py createsuperuser
+# Demo data: set DEMO_LEAD_PASSWORD and DEMO_AGENT_PASSWORD in .env first
+docker compose exec web python manage.py seed_users
+docker compose exec web python manage.py seed_demo --reset
 ```
 
 Open http://localhost:8000/admin/. Health: http://localhost:8000/healthz and `/readyz`.

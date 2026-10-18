@@ -29,8 +29,10 @@ nobody reads because it's long is worse than no doc):
 | `templates/admin/` | Thin Unfold overrides: skip link, dashboard greeting | Live | [templates/admin/README.md](../templates/admin/README.md) |
 | `core/management/` | Management-command package | Live | [core/management/README.md](../core/management/README.md) |
 | `core/management/commands/` | `ensure_bucket` | Live | [core/management/commands/README.md](../core/management/commands/README.md) |
-| `tickets/` | Ticket domain: models, rules, admin | Planned (Phase 1) | [tickets/README.md](../tickets/README.md) |
-| `tickets/migrations/` | Generated migrations, roles data migration | Planned (Phase 1) | [tickets/migrations/README.md](../tickets/migrations/README.md) |
+| `tickets/` | Ticket domain: models, rules, admin, attachment view | Live | [tickets/README.md](../tickets/README.md) |
+| `tickets/migrations/` | Generated schema migration, roles data migration | Live | [tickets/migrations/README.md](../tickets/migrations/README.md) |
+| `tickets/management/` | Management-command package | Live | [tickets/management/README.md](../tickets/management/README.md) |
+| `tickets/management/commands/` | `seed_users`, `seed_demo` | Live | [tickets/management/commands/README.md](../tickets/management/commands/README.md) |
 | `tests/` | pytest-django suite | Live | [tests/README.md](../tests/README.md) |
 | `docker/` | Config for local compose services | Live | [docker/README.md](../docker/README.md) |
 | `docker/seaweedfs/` | Local S3 emulator identities | Live | [docker/seaweedfs/README.md](../docker/seaweedfs/README.md) |
@@ -53,9 +55,9 @@ The root is covered by [../README.md](../README.md) (run it), [../CLAUDE.md](../
 | Design language (Benrey: dark, lime, lit-line nav, self-hosted fonts) | Live | [design-language.md](features/design-language.md) |
 | CI/CD (GitHub Actions → Fly) | Live | [ci-cd.md](features/ci-cd.md) |
 | Hosting (Fly.io, aleksei-ticket-tracker.fly.dev) | Live | [hosting-fly.md](features/hosting-fly.md) |
-| Authentication and roles | Planned | [authentication-and-roles.md](features/authentication-and-roles.md) |
+| Authentication and roles | Live (roles); OAuth planned | [authentication-and-roles.md](features/authentication-and-roles.md) |
 | AI form assistant (Groq) | Planned | [ai-form-assistant.md](features/ai-form-assistant.md) |
 | Error monitoring (Sentry) | Planned | [error-monitoring.md](features/error-monitoring.md) |
-| Demo data (seed) | Planned | [demo-data.md](features/demo-data.md) |
+| Demo data (seed) | Live (commands); reset workflow planned | [demo-data.md](features/demo-data.md) |
 
 The overall build plan and its decisions are in [plan.md](plan.md).

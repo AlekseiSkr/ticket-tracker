@@ -2,10 +2,10 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Planned (no migrations until Phase 1 models exist) |
+| **Status**   | Live |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | `tickets/migrations/` |
 | **Cost**     | $0 |
 | **Depends on** | [../README.md](../README.md), [../../docs/features/database.md](../../docs/features/database.md) |
@@ -40,4 +40,5 @@ No credentials.
   satisfy them.
 
 ## Open items
-- [ ] Phase 1: initial schema + groups/permissions data migration.
+- [x] `0001_initial`: schema, check constraints, indexes (2026-10-18).
+- [x] `0002_roles`: "Support Lead" and "Agent" groups with their permissions. Permissions are created inside the migration because Django normally makes them after `migrate` (2026-10-18).

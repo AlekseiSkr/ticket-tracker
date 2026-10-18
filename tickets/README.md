@@ -2,43 +2,61 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Planned (empty app; built in Phase 1) |
+| **Status**   | Live (Phase 1, v0.1) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | `tickets/` (Django app `tickets`, admin section "Support") |
 | **Cost**     | $0 |
 | **Depends on** | [../docs/plan.md](../docs/plan.md), [../docs/features/admin-ui.md](../docs/features/admin-ui.md), [../docs/features/authentication-and-roles.md](../docs/features/authentication-and-roles.md) |
 
 ## What
-The domain: `Customer`, `Agent`, `Ticket`, `Comment` and `Tag`. It holds the business rules
-(status workflow, concurrency-safe claim, SLA) and the customised Django admin for them.
+The domain: `Customer`, `Agent`, `Ticket`, `Comment` and `Tag`. It holds:
+- the business rules: the status workflow, a concurrency-safe claim with a work-in-progress cap, first-response stamping and SLA;
+- the Django admin for them;
+- the permission-checked attachment download.
 
 ## Why
-- **Business rules live on the models**, so admin actions, the seed command and tests all
-  go through the same code.
-- **Admin actions call model methods**, never `queryset.update()`, which would skip the rules.
+- **Business rules live on the models,** so admin actions, buttons and tests all go through the same code.
+- **Admin actions call model methods,** never `queryset.update()`, which would skip the rules.
+- **One visibility rule** (`Ticket.objects.visible_to(user)`) feeds the ticket list, the customer page's ticket inline and the attachment view, so an Agent can't see another agent's tickets anywhere.
 
 **Rejected:**
-- A separate `services.py` layer: the brief and the rubric expect logic on models.
-- Putting the rules in admin views.
+- A separate `services.py` layer: the brief expects logic on the models.
+- Rules in admin views.
+- `Count("comments")` in the list queryset: it grouped all 25k tickets (about 850 ms). A correlated subquery takes about 180 ms.
 
 ## How it's set up
 | File | Role |
 |---|---|
-| `apps.py` | `TicketsConfig` (verbose name "Support"). |
-| `models.py` | Phase 1: models, constraints, `Ticket.transition_to()`, `Ticket.claim()`, SLA annotations. Currently a placeholder. |
-| `migrations/` | Generated migrations only (see [migrations/README.md](migrations/README.md)). |
-| `admin.py` (Phase 1) | ModelAdmins, inlines, bulk actions, role-aware hooks. |
-| `management/commands/seed_demo.py` (Phase 1) | Demo data (see [../docs/features/demo-data.md](../docs/features/demo-data.md)). |
+| `models.py` | Models and constraints. `TicketQuerySet.visible_to()` and `.with_sla()` (`sla_due_at`, `is_sla_breached`, `age`, all sortable). `Ticket.transition_to()`, `.claim()`, `.assign()`, `.set_priority()`. `Comment.save()` stamps `first_response_at`. |
+| `validators.py` | Attachment rules: allow-listed extensions checked by magic bytes, UTF-8 text check, 10 MB cap, random UUID keys. |
+| `admin.py` | Ticket, Customer, Agent and Tag admins: badges, filters (queue, status, priority, SLA, channel, assignee, tags), search (`#id`, subject, customer), comment inline, bulk actions, workflow buttons, role-aware fields and actions. |
+| `views.py` | `/attachments/<comment_id>/`: a 60 s presigned download for visible tickets only, and 404 otherwise. |
+| `migrations/` | Schema plus the role groups (see [migrations/README.md](migrations/README.md)). |
+| `management/commands/` | `seed_users`, `seed_demo` (see [management/commands/README.md](management/commands/README.md)). |
+
+**Workflow:**
+- new → open needs an assignee.
+- open ↔ pending customer.
+- → resolved needs a public agent reply.
+- resolved → closed is Lead only.
+- A resolved ticket can be reopened. A closed one only by a Lead, within 14 days.
+- Claiming a new ticket opens it.
+
+**SLA (first response):** urgent 1 h, high 4 h, normal 24 h, low 72 h.
+
+Tests: `tests/test_tickets.py`.
 
 ## Who owns what
 No credentials.
 
 ## Gotchas
-- **Hiding a field from Agents means removing it everywhere:** fields, list display,
-  filters, search, autocomplete, error messages and the AI context. The leak-sweep test
-  enforces this.
+- **Hiding a field from Agents means removing it everywhere:** fields, list display, filters, search, autocomplete, error messages and the AI context. The leak-sweep test enforces this for tickets.
+- **Comments are an append-only log.** The inline allows adding but never editing or deleting. The current user's Agent profile is set as the author before validation, so internal notes pass the "needs an agent" constraint.
+- **Unfold badge maps must list every value.** A missing key shows the raw value (`pending_customer`) instead of the label.
+- **Locks are always taken ticket first, then agent,** so concurrent claims can't deadlock.
 
 ## Open items
-- [ ] Phase 1: build everything above (see the model and rule spec in [../docs/plan.md](../docs/plan.md)).
+- [ ] Phase 2: extend the leak sweep to autocomplete JSON and history pages.
+- [ ] Phase 3: the AI form assistant reads role-filtered form metadata from these admins.

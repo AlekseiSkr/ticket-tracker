@@ -2,10 +2,10 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | In progress (theme installed and styled; ticket admin comes in Phase 1) |
+| **Status**   | Live (theme and ticket admin, 2026-10-18) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | `config/settings.py` (`UNFOLD`), `tickets/admin.py` (Phase 1) |
 | **Cost**     | $0 (django-unfold is MIT; the paid "Unfold Studio" is not used) |
 | **Depends on** | [authentication-and-roles.md](authentication-and-roles.md) |
@@ -55,7 +55,7 @@ No credentials.
   (`tests/conftest.py`). The manifest storage would fail without `collectstatic`.
 
 ## Open items
-- [ ] Phase 1: Ticket, Customer, Agent and Tag admins, Comment inline, bulk actions, role
-  restrictions.
+- [x] Phase 1: Ticket, Customer, Agent and Tag admins, Comment inline, bulk actions, role
+  restrictions (2026-10-18, see [tickets/README.md](../../tickets/README.md)).
 - [ ] Phase 6 (optional): role-aware dashboard (tickets by status, SLA breaches, agent load),
   added to `templates/admin/index.html` below the greeting.

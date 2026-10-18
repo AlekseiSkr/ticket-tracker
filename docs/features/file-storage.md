@@ -5,7 +5,7 @@
 | **Status**   | Live (local: SeaweedFS; production: R2 since 2026-10-15) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | Local: `storage` service (chrislusf/seaweedfs:4.48). Prod: Cloudflare R2 bucket `ticket-tracker-media`, EU jurisdiction |
 | **Cost**     | $0 (R2 free tier: 10 GB-month, 1M Class A / 10M Class B ops, free egress) |
 | **Depends on** | [configuration-and-secrets.md](configuration-and-secrets.md) |
@@ -57,6 +57,14 @@ dashboard):
 - Upload from the Fly machine: succeeded.
 - Presigned GET: 200. The same URL after 60 s: **403** (expired). Unsigned GET: 400.
 - Delete: succeeded.
+
+**Attachments (Phase 1):**
+- Keys are random (`attachments/<uuid>.<ext>`).
+- Types are checked by magic bytes (PNG, JPG, PDF, UTF-8 TXT), with a 10 MB cap
+  (`tickets/validators.py`).
+- Downloads go through `/attachments/<comment_id>/`. It checks the user may see the ticket
+  (404 otherwise), then redirects to a 60 s presigned URL that forces
+  `Content-Disposition: attachment` and the right content type.
 
 ## Who owns what
 - **Cloudflare account and billing:** Aleksei.
