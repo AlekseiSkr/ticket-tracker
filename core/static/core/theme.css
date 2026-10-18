@@ -83,12 +83,12 @@ p { text-wrap: pretty; }
 
 /* Section headings inside forms read as the source's captions: lime mono, square bullet.
    They are the headings themselves, not labels stacked above one. */
-fieldset.module h2, .fieldset > h2, fieldset > h2.fieldset-heading, [id$="-heading"] {
+fieldset.module h2, .fieldset > h2, fieldset > h2.fieldset-heading, [id$="-heading"], .assistant-panel h2 {
   position: relative; padding-left: 16px;
   font: 400 .75rem/1.25rem var(--font-mono); letter-spacing: .02em; text-transform: uppercase;
   color: var(--lime-ink);
 }
-fieldset.module h2::before, .fieldset > h2::before, fieldset > h2.fieldset-heading::before, [id$="-heading"]::before {
+fieldset.module h2::before, .fieldset > h2::before, fieldset > h2.fieldset-heading::before, [id$="-heading"]::before, .assistant-panel h2::before {
   content: ""; position: absolute; left: 0; top: 50%; width: 8px; height: 8px; margin-top: -4px;
   background: var(--lime-ink);
 }
@@ -106,7 +106,7 @@ tbody tr:hover { background-color: rgba(195, 255, 0, .03); }
 time, .text-xs.text-subtle { font-variant-numeric: tabular-nums; }
 
 /* ---- Controls: rest, hover, active, focus, disabled ------------------------------------- */
-.bg-primary-600, input[type="submit"] {
+.bg-primary-600, input[type="submit"], .assistant-toggle, .assistant-panel button {
   background-color: var(--lime-signal);
   border-color: var(--lime-signal);
   color: var(--panel);
@@ -114,7 +114,7 @@ time, .text-xs.text-subtle { font-variant-numeric: tabular-nums; }
   transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
 }
 .bg-primary-600 .text-white, .bg-primary-600.text-white, .bg-primary-600 .material-symbols-outlined { color: var(--panel); }
-a.bg-primary-600:hover, button.bg-primary-600:hover, input[type="submit"]:hover { background-color: var(--lime-hover); border-color: var(--lime-hover); }
+a.bg-primary-600:hover, button.bg-primary-600:hover, input[type="submit"]:hover, .assistant-toggle:hover, .assistant-panel button:hover { background-color: var(--lime-hover); border-color: var(--lime-hover); }
 a.bg-primary-600:active, button.bg-primary-600:active, input[type="submit"]:active, button:active { transform: scale(.98); }
 button:disabled, input:disabled, select:disabled, textarea:disabled, .bg-primary-600[disabled] {
   opacity: .45; cursor: not-allowed; transform: none;
@@ -177,26 +177,13 @@ input[type="checkbox"].appearance-none.rounded-full:checked::after { background-
   display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
   width: min(380px, calc(100vw - 32px));
 }
-.assistant-toggle, .assistant-panel button {
-  padding: 10px 16px; border-radius: 8px;
-  background: var(--lime-signal); color: var(--panel);
-  font: 600 .75rem/1 var(--font-mono); letter-spacing: -.01em; text-transform: uppercase;
-  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
-}
-.assistant-toggle:hover, .assistant-panel button:hover { background: var(--lime-hover); }
+/* Colour, type and hover come from the shared lime-button rule above. */
+.assistant-toggle, .assistant-panel button { padding: 10px 16px; border-radius: 8px; font-size: .75rem; line-height: 1; }
 .assistant-panel {
   display: flex; flex-direction: column; gap: 8px; width: 100%;
   padding: 16px; border: 1px solid var(--divider); border-radius: 8px; background: var(--panel);
 }
 .assistant-panel[hidden] { display: none; }
-.assistant-panel h2 {
-  position: relative; padding-left: 16px;
-  font: 400 .75rem/1.25rem var(--font-mono); text-transform: uppercase; color: var(--lime-ink);
-}
-.assistant-panel h2::before {
-  content: ""; position: absolute; left: 0; top: 50%; width: 8px; height: 8px; margin-top: -4px;
-  background: var(--lime-ink);
-}
 .assistant-panel label { font-size: .75rem; color: var(--muted); }
 .assistant-panel textarea {
   width: 100%; padding: 8px 12px; border: 1px solid var(--divider); border-radius: 8px;
