@@ -2,10 +2,10 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Planned (Phase 1) |
+| **Status**   | Live (commands); the live reset workflow comes in Phase 5 |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | `manage.py seed_demo`, `manage.py seed_users`; GitHub Actions "Reset demo data" workflow |
 | **Cost**     | $0 |
 | **Depends on** | [database.md](database.md), [file-storage.md](file-storage.md) |
@@ -15,7 +15,7 @@
 - 25 agents, about 4k customers and 40 tags
 - **about 25k tickets** in states consistent with the workflow, with realistic timestamps
   and some SLA breaches
-- **about 75k comments**, 5% with attachments that reuse about 10 sample files
+- **about 61k comments** (about 2.4 per ticket), 5% with attachments that reuse three sample files
 
 `seed_users` creates one login per role, with passwords from env vars. The seed never
 touches user accounts.
@@ -32,7 +32,11 @@ destructive button in production is a smell.
 - **Seeding on every deploy:** would wipe reviewers' changes mid-review.
 
 ## How it's set up
-- **Local:** `docker compose exec web python manage.py seed_demo --reset`
+- **Local:** set `DEMO_LEAD_PASSWORD` and `DEMO_AGENT_PASSWORD` in `.env`, then run
+  `docker compose exec web python manage.py seed_users` and
+  `docker compose exec web python manage.py seed_demo --reset`. About 30 s for 25k tickets.
+- **Production (first time):** `fly ssh console -C "python manage.py seed_users"` (passwords
+  from Fly secrets), then `fly ssh console -C "python manage.py seed_demo --reset"`.
 - **Live:** GitHub → Actions → *Reset demo data* → Run workflow. It runs
   `fly ssh console -C "python manage.py seed_demo --reset"`.
 
@@ -42,7 +46,11 @@ destructive button in production is a smell.
 ## Gotchas
 - **`bulk_create` skips model `clean()` and `save()`.** The generator must produce
   already-valid states, and a test asserts the seeded data satisfies every rule.
-- **Use `example.com` emails only**, so no real addresses ever appear in the data.
+- **Customer emails use the reserved `.example` domain**, so no real address ever appears.
+- **`--reset` deletes only `seed-*` agent users.** Real and demo accounts stay; their old
+  tickets go with the rest of the demo data.
 
 ## Open items
-- [ ] Build in Phase 1. Measure seed time against Neon (target < 3 min, spike S7).
+- [x] Built in Phase 1 (2026-10-18). About 30 s locally for 25k tickets.
+- [ ] Measure against Neon (target < 3 min, spike S7) on the first production seed.
+- [ ] Phase 5: the GitHub Actions *Reset demo data* workflow.

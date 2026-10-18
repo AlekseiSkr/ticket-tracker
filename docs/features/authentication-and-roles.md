@@ -2,10 +2,10 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Planned (Phase 1 roles; Phase 4 GitHub OAuth) |
+| **Status**   | Live (roles, 2026-10-18); GitHub OAuth planned (Phase 4) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | Django auth + admin; django-allauth (Phase 4); GitHub OAuth App |
 | **Cost**     | $0 |
 | **Depends on** | [admin-ui.md](admin-ui.md), [configuration-and-secrets.md](configuration-and-secrets.md) |
@@ -40,8 +40,19 @@ safe?"
 - **Google OAuth:** needs a consent-screen setup; GitHub is simpler for reviewers.
 
 ## How it's set up
-**Phase 1:**
-- Groups and permissions are created by a data migration.
+**Phase 1 (live since 2026-10-18):**
+- `tickets/migrations/0002_roles.py` creates the groups and their permissions.
+  - **Support Lead:** `view_all_tickets`, `assign_ticket`, `close_ticket`, `change_priority`,
+    and the model permissions, with no ticket or comment delete.
+  - **Agent:** view, add and change tickets; view and add comments; view, add and change
+    customers; view tags. Nothing on agents, users or groups, so those pages and the WIP caps
+    stay hidden.
+- **Code checks permissions, never group names:**
+  - `Ticket.objects.visible_to()` limits Agents to their own tickets plus the queue. Another
+    agent's ticket is not found.
+  - `TicketAdmin.get_readonly_fields` makes priority and assignee read-only for Agents.
+  - `get_actions` removes assign, close and priority actions.
+  - The model methods re-check permissions, so the rules hold outside the admin too.
 - A demo user per role comes from `seed_users`, with passwords from env vars that are never
   committed.
 
