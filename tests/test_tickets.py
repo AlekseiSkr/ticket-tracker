@@ -11,7 +11,7 @@ from django.db import connection
 from django.db.models import Min, Q
 from django.utils import timezone
 
-from tickets.models import OPEN_STATUSES, Agent, Comment, Customer, Ticket
+from tickets.models import OPEN_STATUSES, TRANSITIONS, Agent, Comment, Customer, Ticket
 from tickets.validators import MAX_ATTACHMENT_BYTES, validate_attachment
 
 S = Ticket.Status
@@ -345,3 +345,117 @@ def test_changelist_query_budget(client, db, lead, django_assert_max_num_queries
     client.force_login(lead)
     with django_assert_max_num_queries(15):
         assert client.get("/admin/tickets/ticket/", secure=True).status_code == 200
+
+
+# --- Phase 2: full transition matrix -------------------------------------------------------
+
+
+def ticket_in(status, customer, owner):
+    """A ticket already in `status`, with every prerequisite for leaving it met."""
+    now = timezone.now()
+    ticket = ticket_for(customer, owner.agent, status=S.OPEN)
+    reply(ticket, owner)  # public agent reply, so resolving is allowed
+    resolved = now if status in (S.RESOLVED, S.CLOSED) else None
+    closed = now if status == S.CLOSED else None
+    Ticket.objects.filter(pk=ticket.pk).update(
+        status=status, resolved_at=resolved, closed_at=closed
+    )
+    ticket.refresh_from_db()
+    return ticket
+
+
+@pytest.mark.parametrize("source", list(S))
+@pytest.mark.parametrize("target", list(S))
+def test_transition_matrix(source, target, customer, lead):
+    if source == S.NEW:
+        ticket = ticket_for(customer, lead.agent)  # new, assigned, nothing else needed
+    else:
+        ticket = ticket_in(source, customer, lead)
+    if target in TRANSITIONS[source]:
+        ticket.transition_to(target, lead)
+        ticket.refresh_from_db()
+        assert ticket.status == target
+        assert (ticket.resolved_at is not None) == (target in (S.RESOLVED, S.CLOSED))
+        assert (ticket.closed_at is not None) == (target == S.CLOSED)
+    else:
+        with pytest.raises(ValidationError):
+            ticket.transition_to(target, lead)
+        ticket.refresh_from_db()
+        assert ticket.status == source
+
+
+# --- Phase 2: wider leak sweep -------------------------------------------------------------
+
+
+def test_agent_cannot_reach_another_agents_ticket_by_any_url(client, customer, agent, other_agent):
+    theirs = ticket_in(S.OPEN, customer, other_agent)
+    client.force_login(agent)
+    base = f"/admin/tickets/ticket/{theirs.pk}"
+    for url in (f"{base}/change/", f"{base}/history/", f"{base}/delete/"):
+        response = client.get(url, secure=True)
+        assert response.status_code != 200, url
+        assert theirs.subject not in response.content.decode(), url
+    for button in ("claim", "pending", "open", "resolve", "close"):
+        assert client.get(f"{base}/{button}/", secure=True).status_code in (302, 403, 404), button
+    theirs.refresh_from_db()
+    assert (theirs.status, theirs.assignee_id) == (S.OPEN, other_agent.agent.pk)
+
+
+def test_agent_never_sees_wip_caps_or_the_agent_autocomplete(client, customer, agent):
+    ticket = ticket_for(customer, agent.agent, status=S.OPEN)
+    client.force_login(agent)
+    pages = [
+        "/admin/tickets/ticket/",
+        f"/admin/tickets/ticket/{ticket.pk}/change/",
+        f"/admin/tickets/customer/{customer.pk}/change/",
+    ]
+    for page in pages:
+        html = client.get(page, secure=True).content.decode()
+        assert "max_open_tickets" not in html and "Work-in-progress cap" not in html, page
+    autocomplete = client.get(
+        "/admin/autocomplete/",
+        {"app_label": "tickets", "model_name": "ticket", "field_name": "assignee", "term": ""},
+        secure=True,
+    )
+    assert autocomplete.status_code == 403
+
+
+# --- Phase 2: lead bulk actions ------------------------------------------------------------
+
+
+def run_action(client, action, tickets, **extra):
+    data = {"action": action, "_selected_action": [t.pk for t in tickets], **extra}
+    return client.post("/admin/tickets/ticket/", data, secure=True, follow=True).content.decode()
+
+
+def test_lead_assigns_reprioritises_and_closes_in_bulk(client, customer, lead, agent):
+    new = [ticket_for(customer), ticket_for(customer)]
+    client.force_login(lead)
+
+    assert "Pick an agent" in run_action(client, "assign_selected", new)
+    assert "2 assigned, 0 skipped" in run_action(
+        client, "assign_selected", new, agent=agent.agent.pk
+    )
+    assert set(Ticket.objects.values_list("assignee", flat=True)) == {agent.agent.pk}
+
+    assert "2 updated" in run_action(client, "priority_selected", new, priority="urgent")
+    assert set(Ticket.objects.values_list("priority", flat=True)) == {"urgent"}
+
+    resolved = ticket_in(S.RESOLVED, customer, agent)
+    html = run_action(client, "close_selected", [*new, resolved])
+    assert "1 closed, 2 skipped" in html
+    resolved.refresh_from_db()
+    assert resolved.status == S.CLOSED
+
+
+def test_workflow_button_reports_rule_errors(client, customer, agent):
+    ticket = ticket_for(customer, agent.agent, status=S.OPEN)
+    client.force_login(agent)
+    html = client.get(
+        f"/admin/tickets/ticket/{ticket.pk}/resolve/", secure=True, follow=True
+    ).content.decode()
+    assert "Reply to the customer before resolving" in html
+    reply(ticket, agent)
+    client.get(f"/admin/tickets/ticket/{ticket.pk}/resolve/", secure=True)
+    ticket.refresh_from_db()
+    assert ticket.status == S.RESOLVED

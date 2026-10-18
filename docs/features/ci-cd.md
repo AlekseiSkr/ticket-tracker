@@ -5,7 +5,7 @@
 | **Status**   | Live (CI green since 2026-10-15; auto-deploy to Fly enabled 2026-10-15) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`, `.github/dependabot.yml` |
 | **Cost**     | $0 (GitHub Actions is free on public repos) |
 | **Depends on** | [hosting-fly.md](hosting-fly.md), [configuration-and-secrets.md](configuration-and-secrets.md) |
@@ -13,7 +13,8 @@
 ## What
 **CI** runs on every push and PR:
 - `quality` job: ruff lint and format check, mypy, a check that migrations are committed,
-  pytest with coverage against a real Postgres service, and `check --deploy` with
+  pytest with coverage against a real Postgres service (**fails below 93%**,
+  `[tool.coverage.report] fail_under` in `pyproject.toml`), and `check --deploy` with
   production settings
 - `secrets` job: gitleaks over the full history
 - `docker` job: production image build

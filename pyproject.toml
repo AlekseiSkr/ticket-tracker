@@ -62,3 +62,7 @@ filterwarnings = ["ignore:No directory at:UserWarning"]
 [tool.coverage.run]
 source = ["config", "core", "tickets"]
 omit = ["*/migrations/*", "config/asgi.py", "config/wsgi.py"]
+
+[tool.coverage.report]
+# CI fails below this. 95% measured on 2026-10-18 after Phase 2; raise it as coverage grows.
+fail_under = 93
