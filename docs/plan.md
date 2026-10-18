@@ -53,7 +53,7 @@ Indexes on `(status, priority)` and `(assignee, status)`.
 |---|---|---|
 | 0. Skeleton | Docker stack, settings, health checks, storage, CI, Fly config, docs | **Done 2026-10-15**, live at https://aleksei-ticket-tracker.fly.dev/ |
 | 1. Core | Models, constraints, rules, admin (lists, filters, search, inlines, actions), roles, uploads, seed. **Tag v0.1, deployed** | **Done 2026-10-18** (v0.1) |
-| 2. Tests + CI/CD | Rule matrix, concurrency, role leak sweep, seed invariants; deploy on green | Next (core tests landed with Phase 1) |
+| 2. Tests + CI/CD | Rule matrix, concurrency, role leak sweep, seed invariants; deploy on green | **Done 2026-10-18** (v0.2: 76 tests, 95% coverage, CI gate at 93%) |
 | 3. AI assistant | Grounded chat with a fallback | — |
 | 4. OAuth | GitHub login, approval-gated | — |
 | 5. Hardening | CSP, Sentry, runbook, final README. **v1.0** | — |

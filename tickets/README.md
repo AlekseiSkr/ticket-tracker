@@ -58,5 +58,5 @@ No credentials.
 - **Locks are always taken ticket first, then agent,** so concurrent claims can't deadlock.
 
 ## Open items
-- [ ] Phase 2: extend the leak sweep to autocomplete JSON and history pages.
+- [x] Phase 2: leak sweep extended to history, delete, workflow buttons and the assignee autocomplete (2026-10-18).
 - [ ] Phase 3: the AI form assistant reads role-filtered form metadata from these admins.

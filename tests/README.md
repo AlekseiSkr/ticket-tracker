@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Live (47 tests passing on 2026-10-18) |
+| **Status**   | Live (76 tests passing, 95% coverage, on 2026-10-18) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
@@ -32,11 +32,11 @@ invariants.
 | `test_env.py` | `require_env` and the other helpers fail loudly on missing or invalid values. |
 | `test_health.py` | `/healthz` makes zero queries; `/readyz` up and 503; the admin login page renders. |
 | `test_admin_theme.py` | Dark theme, lime primary, self-hosted fonts, favicon and login art; no dead "Return to site"; skip link before the sidebar; dashboard greeting; Unfold auth admins; branded 404; "Local" badge only under `DEBUG`. |
-| `test_tickets.py` | Workflow rules and first-response stamping; WIP cap and a two-thread concurrent claim (exactly one wins); the Agent leak sweep (list, change view, customer inline, attachment); role-hidden actions, pages and fields; internal note via the admin form; bulk-action skip messages; upload validation; seed invariants; changelist ≤ 15 queries. |
+| `test_tickets.py` | The full transition matrix (all 25 status pairs); workflow rules and first-response stamping; WIP cap and a two-thread concurrent claim (exactly one wins); the Agent leak sweep (list, change, history, delete and every workflow-button URL of another agent's ticket, customer inline, attachment, the assignee autocomplete, WIP caps never shown); Lead bulk assign, priority and close; role-hidden actions, pages and fields; internal note via the admin form; bulk-action skip messages; upload validation; seed invariants; changelist ≤ 15 queries. |
 | `test_storage.py` | URLs are presigned (60 s); the public endpoint is used when set. |
 | `test_ensure_bucket.py` | Creates the bucket only on a 404 with `--create`; never on 403. |
 
-Config is in `pyproject.toml` (`[tool.pytest.ini_options]`, `[tool.coverage.run]`).
+Config is in `pyproject.toml` (`[tool.pytest.ini_options]`, `[tool.coverage.run]`, and `[tool.coverage.report]` with the 93% gate).
 
 ## Who owns what
 No credentials. The test settings use placeholders from `.env` or CI `env:`.
