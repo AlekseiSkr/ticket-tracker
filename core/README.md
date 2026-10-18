@@ -27,6 +27,7 @@ This keeps `tickets/` purely about the domain, so ops code and business rules do
 | `management/` | Operational commands (see [management/README.md](management/README.md)). |
 | `admin.py` | `User` and `Group` re-registered with Unfold's admin classes and forms. |
 | `admin_ui.py` | Callbacks for `settings.UNFOLD` (the "Local" environment badge). |
+| `assistant.py` | The AI form assistant endpoint (`/admin/assistant/`): role-filtered form metadata into the prompt, Groq call, help-text fallback, per-user rate limit (see [../docs/features/ai-form-assistant.md](../docs/features/ai-form-assistant.md)). |
 | `static/core/` | Theme assets: `theme.css`, self-hosted fonts, favicon, login art (see [static/core/README.md](static/core/README.md)). |
 
 Tests: `tests/test_health.py` and `tests/test_ensure_bucket.py`.

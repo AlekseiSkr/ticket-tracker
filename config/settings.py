@@ -134,6 +134,12 @@ if not DEBUG:
     # deploy check that asks for it is silenced on purpose.
     SILENCED_SYSTEM_CHECKS = ["security.W021"]
 
+# --- AI form assistant (core/assistant.py) --------------------------------------
+# Any of these blank: the assistant answers with the field's own help text instead.
+LLM_BASE_URL = optional_env("LLM_BASE_URL")
+LLM_MODEL = optional_env("LLM_MODEL")
+GROQ_API_KEY = optional_env("GROQ_API_KEY")
+
 # --- Logging ------------------------------------------------------------------
 LOGGING = {
     "version": 1,

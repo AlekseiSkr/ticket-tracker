@@ -1,0 +1,26 @@
+{% extends "admin/change_form.html" %}
+{% comment %}Extends Unfold's change form (the next loader) to mount the AI form assistant on every add and change page. core/static/core/assistant.js drives it.{% endcomment %}
+{% load static %}
+
+{% block form_after %}
+    {{ block.super }}
+    <aside class="assistant" aria-label="Form assistant"
+           data-url="{% url 'assistant' %}" data-form="{{ opts.model_name }}_form"
+           data-app-label="{{ opts.app_label }}" data-model-name="{{ opts.model_name }}"
+           data-object-id="{{ object_id|default_if_none:'' }}">
+        <form class="assistant-panel" id="assistant-panel" hidden>
+            {% csrf_token %}
+            <h2>Form assistant</h2>
+            <p class="assistant-field" aria-live="polite">Click into a field, then ask about it.</p>
+            <label for="assistant-question">Question</label>
+            <textarea id="assistant-question" rows="3" maxlength="500" required
+                      placeholder="What does this field mean?"></textarea>
+            <button type="submit">Ask</button>
+            <p class="assistant-answer" aria-live="polite"></p>
+        </form>
+        <button type="button" class="assistant-toggle" aria-expanded="false" aria-controls="assistant-panel">
+            Ask about this form
+        </button>
+    </aside>
+    <script src="{% static 'core/assistant.js' %}" defer></script>
+{% endblock %}
