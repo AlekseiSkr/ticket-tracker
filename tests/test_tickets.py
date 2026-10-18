@@ -11,7 +11,7 @@ from django.db import connection
 from django.db.models import Min, Q
 from django.utils import timezone
 
-from tickets.models import OPEN_STATUSES, TRANSITIONS, Agent, Comment, Ticket
+from tickets.models import OPEN_STATUSES, TRANSITIONS, Agent, Comment, Customer, Ticket
 from tickets.validators import MAX_ATTACHMENT_BYTES, validate_attachment
 
 S = Ticket.Status
@@ -153,6 +153,24 @@ def test_concurrent_claims_have_exactly_one_winner(customer, agent, other_agent)
 
 
 # --- Roles and isolation (the leak sweep) --------------------------------------------------
+
+
+def test_ticket_search(client, customer, agent, other_agent):
+    other = Customer.objects.create(name="Bo Berg", email="bo@shop.example")
+    refund = ticket_for(customer, agent.agent, status=S.OPEN, subject="Refund for order")
+    berg = ticket_for(other, subject="Where is my parcel")
+    ticket_for(other, other_agent.agent, status=S.OPEN, subject="Refund, again")
+    client.force_login(agent)
+
+    def found(q):
+        response = client.get("/admin/tickets/ticket/", {"q": q}, secure=True)
+        return {t.pk for t in response.context["cl"].result_list}
+
+    assert found("refund") == {refund.pk}  # an Agent never finds another agent's ticket
+    assert found("berg") == found("SHOP.example") == {berg.pk}  # customer name and email
+    assert found(f"#{berg.pk}") == found(str(berg.pk)) == {berg.pk}
+    assert found('"for order" anna') == {refund.pk}  # every term must match
+    assert found("99999999999999999999") == set()  # out of integer range: no match, no error
 
 
 def test_agent_sees_only_own_and_unassigned_tickets(client, customer, agent, other_agent):

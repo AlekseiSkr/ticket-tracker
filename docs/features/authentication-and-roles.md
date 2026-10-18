@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Live (roles and reviewer accounts, 2026-10-18) |
+| **Status**   | Live (roles, reviewer accounts and login rate limit, 2026-10-18) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-18 |
@@ -59,10 +59,11 @@ Separate accounts per reviewer, rather than one shared login per role, keep each
 
 ## Gotchas
 - **Hiding a field isn't enough.** It must also be removed from `search_fields`, list filters, autocomplete results, error messages and the AI context. A leak-sweep test logs in as an Agent and checks every admin URL.
-- **The admin login has no rate limit.** OAuth's allauth `secure_admin_login` was going to provide one, and it went with OAuth. Until Phase 5 adds one, the only defence is strong passwords.
+- **Login rate limit (2026-10-18):** `core.forms.RateLimitedLoginForm`, wired in through `UNFOLD["LOGIN"]["form"]`. Ten failed logins from one IP block it for 15 minutes, even with the right password. The check runs before the password is hashed, so a blocked client costs no CPU. The IP comes from Fly's `Fly-Client-IP` header (behind Fly, `REMOTE_ADDR` is the proxy). The count lives in the per-process cache, so with two workers the real limit is up to 20. A restart clears it.
+  **Rejected:** django-axes (lockout tables and settings for one rule), and locking per username (anyone could lock a reviewer out).
 - **Not Argon2 (switched 2026-10-18).** Django's Argon2 settings take 100 MB of memory per hash, and Django hashes even for unknown usernames. About six parallel anonymous login attempts would push the 512 MB VM out of memory. PBKDF2 is CPU-bound, with no memory spike. Existing Argon2 hashes still verify (`argon2-cffi` stays installed) and are rehashed to PBKDF2 at the next login. Rerunning `seed_users` rehashes the reviewer accounts at once.
   **Rejected:** keeping Argon2 with a lower `memory_cost` (a custom hasher subclass to maintain).
 
 ## Open items
 - [x] **Benrey answered (2026-10-18):** pre-made accounts only, for two reviewers.
-- [ ] **Phase 5:** rate-limit the admin login (django-axes, or a small cache-backed check keyed on `Fly-Client-IP`).
+- [x] **Phase 5:** rate-limit the admin login (done 2026-10-18, see Gotchas).
