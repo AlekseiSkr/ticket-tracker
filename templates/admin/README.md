@@ -5,7 +5,7 @@
 | **Status**   | Live |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | Overrides `admin/base.html`, `admin/index.html` and `admin/change_form.html` from django-unfold |
 | **Cost**     | $0 |
 | **Depends on** | [../README.md](../README.md), [../../docs/features/admin-ui.md](../../docs/features/admin-ui.md) |
@@ -26,7 +26,7 @@ without replacing any Unfold markup.
 |---|---|
 | `base.html` | "Skip to main content" as the first focusable element on every admin page. |
 | `index.html` | The dashboard greeting ("Welcome back, {name}.") and today's date above Unfold's app list. |
-| `change_form.html` | The AI form assistant panel (block `form_after`) on every add and change page; `core/static/core/assistant.js` drives it. |
+| `change_form.html` | The AI form assistant panel (block `form_after`) on every add and change page; `core/static/core/assistant.js` drives it. The field list is rendered from the admin form and its inlines, so read-only, disabled and dropdown (select2) fields are listed even though they can't be focused. |
 
 ## Who owns what
 No credentials.

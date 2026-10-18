@@ -2,7 +2,7 @@
 
 shortcut: rows are bulk-inserted with workflow-consistent states instead of calling
 transition_to() per ticket (that would take many minutes on Neon). The DB constraints still
-hold, and tests/test_seed.py checks the rule invariants on the output.
+hold, and tests/test_tickets.py checks the rule invariants on the output.
 """
 
 import random
@@ -24,54 +24,15 @@ SEED_PREFIX = "seed-"  # seeded agent users; --reset deletes only these, never r
 BATCH = 1000
 
 FIRST = [
-    "Anna",
-    "Mart",
-    "Liis",
-    "Kaarel",
-    "Eva",
-    "Jaan",
-    "Kati",
-    "Rasmus",
-    "Laura",
-    "Markus",
-    "Sofia",
-    "Oskar",
-    "Mia",
-    "Robin",
-    "Hanna",
-    "Karl",
-    "Elena",
-    "Tomas",
-    "Ida",
-    "Mikk",
-    "Sara",
-    "Lukas",
-    "Emma",
-    "Joonas",
-    "Nora",
-]  # noqa: E501
+    "Anna", "Mart", "Liis", "Kaarel", "Eva", "Jaan", "Kati", "Rasmus", "Laura", "Markus", "Sofia",
+    "Oskar", "Mia", "Robin", "Hanna", "Karl", "Elena", "Tomas", "Ida", "Mikk", "Sara", "Lukas",
+    "Emma", "Joonas", "Nora",
+]  # fmt: skip
 LAST = [
-    "Tamm",
-    "Saar",
-    "Sepp",
-    "Mägi",
-    "Kask",
-    "Kukk",
-    "Rebane",
-    "Ilves",
-    "Pärn",
-    "Koppel",
-    "Virtanen",
-    "Korhonen",
-    "Berzins",
-    "Kazlauskas",
-    "Lindqvist",
-    "Novak",
-    "Fischer",
-    "Weber",
-    "Nowak",
-    "Jansen",
-]  # noqa: E501
+    "Tamm", "Saar", "Sepp", "Mägi", "Kask", "Kukk", "Rebane", "Ilves", "Pärn", "Koppel",
+    "Virtanen", "Korhonen", "Berzins", "Kazlauskas", "Lindqvist", "Novak", "Fischer", "Weber",
+    "Nowak", "Jansen",
+]  # fmt: skip
 COMPANY_NAMES = [
     "Nordbyte", "Baltic Freight", "Tallinn Tea House", "Riga Robotics", "Vilnius Bikes",
     "Kalev Apps", "Saare Fish", "Helsinki Health", "Tartu Labs", "Pärnu Surf", "Narva Steel",
@@ -110,17 +71,9 @@ SUBJECTS = [
 ]
 AREAS = ["billing", "reports", "settings", "projects", "team", "integrations"]
 MONTHS = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
+    "January", "February", "March", "April", "May", "June", "July", "August", "September",
     "October",
-]
+]  # fmt: skip
 CUSTOMER_LINES = [
     "This started this morning and nothing I try fixes it.",
     "It worked fine last week. Any idea what changed?",
@@ -231,7 +184,7 @@ class Command(BaseCommand):
         # Workflow shape: a small new queue, open work under each agent's cap, the rest history.
         wip = {a.pk: 0 for a in agents}
         tickets: list[Ticket] = []
-        plans: list[tuple[Agent | None, list[tuple[datetime, Agent | None, bool]]]] = []
+        plans: list[list[tuple[datetime, Agent | None, bool]]] = []  # comments per ticket
         n_new = max(n_tickets // 100, 1)
         for i in range(n_tickets):
             priority = rng.choices(P.values, weights=[20, 50, 22, 8])[0]
@@ -299,13 +252,13 @@ class Command(BaseCommand):
                     (min(created + timedelta(hours=rng.uniform(0.5, 5)), now), None, False)
                 )
             tickets.append(ticket)
-            plans.append((assignee, comments))
+            plans.append(comments)
 
         Ticket.objects.bulk_create(tickets, batch_size=BATCH)
 
         comment_rows: list[Comment] = []
         tag_rows: list[Any] = []
-        for ticket, (_, comments) in zip(tickets, plans, strict=True):
+        for ticket, comments in zip(tickets, plans, strict=True):
             for created_at, author, internal in comments:
                 if author is None:
                     body = rng.choice(CUSTOMER_LINES)

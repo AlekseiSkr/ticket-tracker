@@ -25,12 +25,13 @@ The domain: `Customer`, `Agent`, `Ticket`, `Comment` and `Tag`. It holds:
 - A separate `services.py` layer: the brief expects logic on the models.
 - Rules in admin views.
 - `Count("comments")` in the list queryset: it grouped all 25k tickets (about 850 ms). A correlated subquery takes about 180 ms.
+- A plain OFFSET for deep pages: Postgres ran the comment subquery for every skipped row (the last page took 521 ms in SQL, over 1.5 s in the admin). `IdsFirstPaginator` picks the page's 50 ids first, then annotates only those (43 ms).
 
 ## How it's set up
 | File | Role |
 |---|---|
 | `models.py` | Models and constraints. `TicketQuerySet.visible_to()` and `.with_sla()` (`sla_due_at`, `is_sla_breached`, `age`, all sortable). `Ticket.transition_to()`, `.claim()`, `.assign()`, `.set_priority()`. `Comment.save()` stamps `first_response_at`. |
-| `validators.py` | Attachment rules: allow-listed extensions checked by magic bytes, UTF-8 text check, 10 MB cap, random UUID keys. |
+| `validators.py` | Attachment rules: allow-listed extensions checked by magic bytes, UTF-8 text check, 10 MB cap, random UUID keys. `CappedUploadHandler` refuses requests over 11 MB instead of dropping the file silently. |
 | `admin.py` | Ticket, Customer, Agent and Tag admins: badges, filters (queue, status, priority, SLA, channel, assignee, tags), search (`#id`, subject, customer), comment inline, bulk actions, workflow buttons, role-aware fields and actions. |
 | `views.py` | `/attachments/<comment_id>/`: a 60 s presigned download for visible tickets only, and 404 otherwise. |
 | `migrations/` | Schema plus the role groups (see [migrations/README.md](migrations/README.md)). |

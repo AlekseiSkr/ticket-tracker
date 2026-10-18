@@ -55,7 +55,9 @@ django_settings_module = "config.settings"
 DJANGO_SETTINGS_MODULE = "config.settings"
 python_files = ["test_*.py"]
 testpaths = ["tests"]
-addopts = "--strict-markers"
+# The stress test only runs on demand: pytest -m stress -s (see tests/test_stress.py).
+addopts = "--strict-markers -m \"not stress\""
+markers = ["stress: slow load test, run with -m stress"]
 # WhiteNoise warns that STATIC_ROOT is empty; tests never run collectstatic.
 filterwarnings = ["ignore:No directory at:UserWarning"]
 

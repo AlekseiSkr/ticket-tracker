@@ -14,7 +14,9 @@
 All uploaded files (comment attachments) go to one **private** S3-compatible bucket through
 `config.storage.PrivateMediaStorage`, a thin subclass of django-storages' `S3Storage`.
 Every file URL is presigned and expires in 60 s. Nothing is written to the container's disk:
-uploads stay in memory (max 10 MB) on their way to the bucket.
+uploads stay in memory on their way to the bucket. `tickets.validators.CappedUploadHandler` refuses
+a request over 11 MB with a 400 page; Django's stock handler would skip the file silently and
+save the comment without it. Between 10 and 11 MB, the validator shows a form error.
 
 ## Why
 - **Object storage, not disk:** Fly machines have ephemeral disks, and the brief requires it.

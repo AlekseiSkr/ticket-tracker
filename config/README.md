@@ -26,7 +26,7 @@ env-variable helpers and the object-storage backend. No business logic lives her
 ## How it's set up
 | File | Role |
 |---|---|
-| `settings.py` | All settings. Reads env through `env.py`. Sections: database, auth (Argon2), files (memory-only uploads, S3 `STORAGES`), static (WhiteNoise), security (switched on when `DJANGO_DEBUG` is false), logging, `UNFOLD` (dark theme, Benrey colour ramps, fonts and `core/theme.css`; see [design-language.md](../docs/features/design-language.md)). |
+| `settings.py` | All settings. Reads env through `env.py`. Sections: database, auth (Django's default PBKDF2), files (memory-only uploads capped at 11 MB, S3 `STORAGES`), static (WhiteNoise), security (switched on when `DJANGO_DEBUG` is false), logging, `UNFOLD` (dark theme, Benrey colour ramps, fonts and `core/theme.css`; see [design-language.md](../docs/features/design-language.md)). |
 | `env.py` | `require_env`, `optional_env`, `env_bool`, `env_int`, `env_list`. Raise `ImproperlyConfigured` on missing or invalid values. |
 | `storage.py` | `PrivateMediaStorage` (django-storages `S3Storage`). Every URL is presigned, 60 s. `public_endpoint_url` signs URLs for the browser-facing host in local Docker. |
 | `urls.py` | `/admin/` plus a `/` redirect to it. Health endpoints are **not** here; they're middleware in `core/`. |

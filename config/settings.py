@@ -73,10 +73,8 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # --- Auth -------------------------------------------------------------------
-PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.Argon2PasswordHasher",
-    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-]
+# Django's default hashers (PBKDF2 first). Argon2 takes 100 MB per login attempt, so a few
+# parallel anonymous logins would exhaust the 512 MB VM. Old Argon2 hashes are rehashed at login.
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -86,10 +84,11 @@ AUTH_PASSWORD_VALIDATORS = [
 SESSION_COOKIE_AGE = 8 * 60 * 60  # one working day
 
 # --- Files ------------------------------------------------------------------
-# Uploads go straight to object storage. Keeping them in memory (max 10 MB) means
-# nothing is ever written to the container's ephemeral disk.
-FILE_UPLOAD_HANDLERS = ["django.core.files.uploadhandler.MemoryFileUploadHandler"]
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+# Uploads go straight to object storage. Keeping them in memory means nothing is ever written
+# to the container's ephemeral disk. Larger requests are refused; 11 MB leaves room for the
+# form fields around a 10 MB attachment, so the validator's message covers 10-11 MB.
+FILE_UPLOAD_HANDLERS = ["tickets.validators.CappedUploadHandler"]
+FILE_UPLOAD_MAX_MEMORY_SIZE = 11 * 1024 * 1024
 DATA_UPLOAD_MAX_MEMORY_SIZE = 11 * 1024 * 1024
 
 STORAGES = {
