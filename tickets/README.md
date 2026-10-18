@@ -31,7 +31,7 @@ The domain: `Customer`, `Agent`, `Ticket`, `Comment` and `Tag`. It holds:
 ## How it's set up
 | File | Role |
 |---|---|
-| `models.py` | Models and constraints. `TicketQuerySet.visible_to()` and `.with_sla()` (`sla_due_at`, `is_sla_breached`, `age`, all sortable). `Ticket.transition_to()`, `.claim()`, `.assign()`, `.set_priority()`. `Comment.save()` stamps `first_response_at`. |
+| `models.py` | Models and constraints. `Agent.for_user()` creates a staff user's profile on first use. `TicketQuerySet.visible_to()` and `.with_sla()` (`sla_due_at`, `is_sla_breached`, `age`, all sortable). `Ticket.transition_to()`, `.claim()`, `.assign()`, `.set_priority()`. `Comment.save()` stamps `first_response_at`. |
 | `validators.py` | Attachment rules: allow-listed extensions checked by magic bytes, UTF-8 text check, 10 MB cap, random UUID keys. `CappedUploadHandler` refuses requests over 11 MB instead of dropping the file silently. |
 | `admin.py` | Ticket, Customer, Agent and Tag admins: badges, filters (queue, status, priority, SLA, channel, assignee, tags), search (`#id` or a number, subject, customer name or email), comment inline, bulk actions, workflow buttons, role-aware fields and actions. |
 | `views.py` | `/attachments/<comment_id>/`: a 60 s presigned download for visible tickets only, and 404 otherwise. |

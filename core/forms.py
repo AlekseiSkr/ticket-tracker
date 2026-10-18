@@ -2,9 +2,10 @@
 
 from typing import Any
 
-from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from unfold.forms import AuthenticationForm
+
+from core import ratelimit
 
 MAX_FAILURES = 10
 WINDOW = 15 * 60  # seconds, counted from the first failure
@@ -18,9 +19,7 @@ class RateLimitedLoginForm(AuthenticationForm):
         # Fly's proxy sets Fly-Client-IP; behind it, REMOTE_ADDR is the proxy itself.
         meta = self.request.META if self.request else {}
         key = f"login-failures:{meta.get('HTTP_FLY_CLIENT_IP') or meta.get('REMOTE_ADDR')}"
-        # shortcut: the default cache is per process (2 gunicorn workers), so the real limit
-        # is up to 2x; move to a shared cache if that matters.
-        if cache.get(key, 0) >= MAX_FAILURES:
+        if ratelimit.count(key) >= MAX_FAILURES:
             raise ValidationError(
                 "Too many failed logins from your network. Try again in 15 minutes.",
                 code="rate_limited",
@@ -28,9 +27,5 @@ class RateLimitedLoginForm(AuthenticationForm):
         try:
             return super().clean()
         except ValidationError:
-            if not cache.add(key, 1, WINDOW):
-                try:
-                    cache.incr(key)
-                except ValueError:  # the window expired between add() and incr()
-                    cache.add(key, 1, WINDOW)
+            ratelimit.hit(key, WINDOW)
             raise

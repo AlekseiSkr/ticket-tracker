@@ -24,6 +24,23 @@
   methods, never `queryset.update()`.
 - **Hiding a field from a role** means removing it everywhere: fields, list display, filters,
   search, autocomplete, error messages and the AI context.
+- **Design principles, applied the Django way** (only where they remove a real problem;
+  no pattern for its own sake, no abstraction without a second user):
+  - **Single responsibility:** models hold the rules, admins present them, `core/` holds
+    cross-cutting infrastructure (one module per concern, e.g. `ratelimit.py`). Split long
+    methods into named steps.
+  - **Open/closed:** prefer a table to a growing `if` chain: `TRANSITIONS`, `SLA_HOURS`,
+    `LEAD_ACTIONS`. A new status, priority or Lead action is a new row.
+  - **Liskov:** a subclass keeps its parent's contract (`PrivateMediaStorage.url`,
+    `RateLimitedLoginForm.clean`).
+  - **Dependency inversion:** depend on Django's abstractions (`default_storage`, `cache`,
+    `settings`) and swap the implementation through configuration, not code.
+  - **Don't repeat yourself:** one place per rule. Check for an existing helper first.
+  - **Patterns in use:** state machine (`TRANSITIONS`), query object (`TicketQuerySet`),
+    template method (`ModelAdmin` hooks), command (admin actions, management commands), chain
+    of responsibility (middleware), strategy by config (`STORAGES`, `LLM_*`), adapter
+    (`PrivateMediaStorage`), fail-fast config (`require_env`), graceful degradation (the AI
+    assistant falls back to help text).
 - **Before finishing a change:** `pytest`, `ruff check .`, `ruff format --check .` and
   `mypy .` all pass.
 - **The plan and its phases** are in `docs/plan.md`.

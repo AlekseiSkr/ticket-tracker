@@ -5,7 +5,7 @@
 | **Status**   | Live |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-18 |
-| **Updated**  | 2026-10-18 |
+| **Updated**  | 2026-10-19 |
 | **Where**    | `python manage.py seed_users`, `python manage.py seed_demo` |
 | **Cost**     | $0 |
 | **Depends on** | [../../../docs/features/demo-data.md](../../../docs/features/demo-data.md) |
@@ -30,7 +30,7 @@
 | File | Role |
 |---|---|
 | `seed_users.py` | A Lead and an Agent account for each of the two reviewers. |
-| `seed_demo.py` | Demo data. `--reset` deletes tickets, comments, customers, tags and the `seed-*` agent users; real accounts stay. |
+| `seed_demo.py` | Demo data, in named steps: upload samples, agents, customers, tags, one planned ticket at a time (`_plan_ticket`), then comments and tags. `--reset` deletes tickets, comments, customers, tags and the `seed-*` agent users; real accounts stay. |
 
 Order: run `seed_users` first, so the reviewer Agent accounts also get open tickets.
 

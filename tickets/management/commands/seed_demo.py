@@ -146,11 +146,35 @@ class Command(BaseCommand):
             seeded.delete()
 
     def _seed(self, rng: random.Random, now: datetime, n_tickets: int) -> dict[str, int]:
+        sample_names = self._upload_samples()
+        users, agents = self._seed_agents(rng)
+        customers = self._seed_customers(rng, now, n_tickets)
+        tags = Tag.objects.bulk_create(Tag(name=name) for name in TAGS)
+
+        wip = {a.pk: 0 for a in agents}  # open tickets per agent, kept under each cap
+        n_new = max(n_tickets // 100, 1)
+        planned = [
+            self._plan_ticket(rng, i, n_tickets, n_new, now, agents, customers, wip)
+            for i in range(n_tickets)
+        ]
+        tickets = [ticket for ticket, _ in planned]
+        Ticket.objects.bulk_create(tickets, batch_size=BATCH)
+        n_comments = self._seed_comments_and_tags(rng, planned, tags, sample_names)
+        return {
+            "agents": len(users),
+            "customers": len(customers),
+            "tags": len(tags),
+            "tickets": len(tickets),
+            "comments": n_comments,
+        }
+
+    def _upload_samples(self) -> list[str]:
         for name, data in SAMPLES.items():
             if not default_storage.exists(name):
                 default_storage.save(name, ContentFile(data))
-        sample_names = list(SAMPLES)
+        return list(SAMPLES)
 
+    def _seed_agents(self, rng: random.Random) -> tuple[list[Any], list[Agent]]:
         User = get_user_model()
         users = User.objects.bulk_create(
             User(
@@ -163,8 +187,10 @@ class Command(BaseCommand):
         )
         Agent.objects.bulk_create(Agent(user=u, team=rng.choice(Agent.Team.values)) for u in users)
         agents = list(Agent.objects.select_related("user"))  # includes the reviewer accounts
+        return users, agents
 
-        customers = Customer.objects.bulk_create(
+    def _seed_customers(self, rng: random.Random, now: datetime, n_tickets: int) -> list[Customer]:
+        return Customer.objects.bulk_create(
             (
                 Customer(
                     name=f"{first} {last}",
@@ -179,86 +205,93 @@ class Command(BaseCommand):
             ),
             batch_size=BATCH,
         )
-        tags = Tag.objects.bulk_create(Tag(name=name) for name in TAGS)
 
-        # Workflow shape: a small new queue, open work under each agent's cap, the rest history.
-        wip = {a.pk: 0 for a in agents}
-        tickets: list[Ticket] = []
-        plans: list[list[tuple[datetime, Agent | None, bool]]] = []  # comments per ticket
-        n_new = max(n_tickets // 100, 1)
-        for i in range(n_tickets):
-            priority = rng.choices(P.values, weights=[20, 50, 22, 8])[0]
-            sla = timedelta(hours=SLA_HOURS[P(priority)])
-            if i < n_new:
-                status, age = S.NEW, timedelta(hours=rng.uniform(0.2, 40))
-            elif i < n_new * 4:
-                status, age = (
-                    rng.choice([S.OPEN, S.OPEN, S.PENDING_CUSTOMER]),
-                    timedelta(days=rng.uniform(0.2, 10)),
-                )
-            elif i < n_tickets // 10:
-                status, age = S.RESOLVED, timedelta(days=rng.uniform(1, 14))
+    def _plan_ticket(
+        self,
+        rng: random.Random,
+        i: int,
+        n_tickets: int,
+        n_new: int,
+        now: datetime,
+        agents: list[Agent],
+        customers: list[Customer],
+        wip: dict[int, int],
+    ) -> tuple[Ticket, list[tuple[datetime, Agent | None, bool]]]:
+        """One ticket in a workflow-consistent state, plus its comments as (time, author,
+        internal). Shape: a small new queue, open work under each agent's cap, the rest history.
+        """
+        priority = rng.choices(P.values, weights=[20, 50, 22, 8])[0]
+        sla = timedelta(hours=SLA_HOURS[P(priority)])
+        if i < n_new:
+            status, age = S.NEW, timedelta(hours=rng.uniform(0.2, 40))
+        elif i < n_new * 4:
+            status, age = (
+                rng.choice([S.OPEN, S.OPEN, S.PENDING_CUSTOMER]),
+                timedelta(days=rng.uniform(0.2, 10)),
+            )
+        elif i < n_tickets // 10:
+            status, age = S.RESOLVED, timedelta(days=rng.uniform(1, 14))
+        else:
+            status, age = S.CLOSED, timedelta(days=rng.uniform(3, 180))
+        created = now - age
+
+        assignee: Agent | None = None
+        if status in (S.OPEN, S.PENDING_CUSTOMER):
+            free = [a for a in agents if wip[a.pk] < a.max_open_tickets - 3]
+            if not free:  # every agent near their cap: leave it in the queue
+                status = S.NEW
             else:
-                status, age = S.CLOSED, timedelta(days=rng.uniform(3, 180))
-            created = now - age
+                assignee = rng.choice(free)
+                wip[assignee.pk] += 1
+        elif status != S.NEW:
+            assignee = rng.choice(agents)
 
-            assignee: Agent | None = None
-            if status in (S.OPEN, S.PENDING_CUSTOMER):
-                free = [a for a in agents if wip[a.pk] < a.max_open_tickets - 3]
-                if not free:  # every agent near their cap: leave it in the queue
-                    status = S.NEW
-                else:
-                    assignee = rng.choice(free)
-                    wip[assignee.pk] += 1
-            elif status != S.NEW:
-                assignee = rng.choice(agents)
+        ticket = Ticket(
+            customer=rng.choice(customers),
+            assignee=assignee,
+            subject=rng.choice(SUBJECTS).format(month=rng.choice(MONTHS), area=rng.choice(AREAS)),
+            description=" ".join(rng.sample(CUSTOMER_LINES, 2)),
+            status=status,
+            priority=priority,
+            channel=rng.choices(C.values, weights=[50, 25, 10, 15])[0],
+            created_at=created,
+        )
+        # The first public agent reply is the first response.
+        comments: list[tuple[datetime, Agent | None, bool]] = []
+        answered = status in (S.RESOLVED, S.CLOSED, S.PENDING_CUSTOMER) or (
+            status == S.OPEN and rng.random() < 0.7
+        )
+        if answered:
+            late = rng.random() < 0.1  # about one in ten misses the first-response SLA
+            delay = sla * (rng.uniform(1.1, 3) if late else rng.uniform(0.05, 0.9))
+            first = min(created + delay, now - timedelta(minutes=5))
+            ticket.first_response_at = max(first, created)
+            comments.append((ticket.first_response_at, assignee, False))
+            t = ticket.first_response_at
+            for _ in range(rng.randint(0, 3)):
+                t = min(t + timedelta(hours=rng.uniform(0.5, 30)), now)
+                author = rng.choice([None, assignee, assignee])
+                comments.append((t, author, author is not None and rng.random() < 0.3))
+            if status in (S.RESOLVED, S.CLOSED):
+                ticket.resolved_at = min(t + timedelta(hours=rng.uniform(0.5, 48)), now)
+                if status == S.CLOSED:
+                    ticket.closed_at = min(
+                        ticket.resolved_at + timedelta(days=rng.uniform(1, 7)), now
+                    )
+        elif rng.random() < 0.3:
+            comments.append((min(created + timedelta(hours=rng.uniform(0.5, 5)), now), None, False))
+        return ticket, comments
 
-            ticket = Ticket(
-                customer=rng.choice(customers),
-                assignee=assignee,
-                subject=rng.choice(SUBJECTS).format(
-                    month=rng.choice(MONTHS), area=rng.choice(AREAS)
-                ),
-                description=" ".join(rng.sample(CUSTOMER_LINES, 2)),
-                status=status,
-                priority=priority,
-                channel=rng.choices(C.values, weights=[50, 25, 10, 15])[0],
-                created_at=created,
-            )
-            # Comments: (time, author, internal). The first public agent reply = first response.
-            comments: list[tuple[datetime, Agent | None, bool]] = []
-            answered = status in (S.RESOLVED, S.CLOSED, S.PENDING_CUSTOMER) or (
-                status == S.OPEN and rng.random() < 0.7
-            )
-            if answered:
-                late = rng.random() < 0.1  # about one in ten misses the first-response SLA
-                delay = sla * (rng.uniform(1.1, 3) if late else rng.uniform(0.05, 0.9))
-                first = min(created + delay, now - timedelta(minutes=5))
-                ticket.first_response_at = max(first, created)
-                comments.append((ticket.first_response_at, assignee, False))
-                t = ticket.first_response_at
-                for _ in range(rng.randint(0, 3)):
-                    t = min(t + timedelta(hours=rng.uniform(0.5, 30)), now)
-                    author = rng.choice([None, assignee, assignee])
-                    comments.append((t, author, author is not None and rng.random() < 0.3))
-                if status in (S.RESOLVED, S.CLOSED):
-                    ticket.resolved_at = min(t + timedelta(hours=rng.uniform(0.5, 48)), now)
-                    if status == S.CLOSED:
-                        ticket.closed_at = min(
-                            ticket.resolved_at + timedelta(days=rng.uniform(1, 7)), now
-                        )
-            elif rng.random() < 0.3:
-                comments.append(
-                    (min(created + timedelta(hours=rng.uniform(0.5, 5)), now), None, False)
-                )
-            tickets.append(ticket)
-            plans.append(comments)
-
-        Ticket.objects.bulk_create(tickets, batch_size=BATCH)
-
+    def _seed_comments_and_tags(
+        self,
+        rng: random.Random,
+        planned: list[tuple[Ticket, list[tuple[datetime, Agent | None, bool]]]],
+        tags: list[Tag],
+        sample_names: list[str],
+    ) -> int:
         comment_rows: list[Comment] = []
         tag_rows: list[Any] = []
-        for ticket, comments in zip(tickets, plans, strict=True):
+        for ticket, comments in planned:
             for created_at, author, internal in comments:
                 if author is None:
                     body = rng.choice(CUSTOMER_LINES)
@@ -278,10 +311,4 @@ class Command(BaseCommand):
                 tag_rows.append(Ticket.tags.through(ticket_id=ticket.pk, tag_id=tag.pk))
         Comment.objects.bulk_create(comment_rows, batch_size=BATCH)
         Ticket.tags.through.objects.bulk_create(tag_rows, batch_size=BATCH)
-        return {
-            "agents": len(users),
-            "customers": len(customers),
-            "tags": len(tags),
-            "tickets": len(tickets),
-            "comments": len(comment_rows),
-        }
+        return len(comment_rows)

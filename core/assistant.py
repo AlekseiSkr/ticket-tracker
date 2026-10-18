@@ -16,13 +16,13 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.utils import flatten_fieldsets, help_text_for_field, label_for_field
-from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist, PermissionDenied
 from django.http import Http404, HttpRequest, JsonResponse
 from django.utils.html import strip_tags
 from django.utils.text import capfirst
 from django.views.decorators.http import require_POST
 
+from core import ratelimit
 from tickets.models import REOPEN_WINDOW, SLA_HOURS, TRANSITIONS, Ticket
 
 logger = logging.getLogger(__name__)
@@ -148,14 +148,7 @@ def ask_llm(messages: list[dict[str, str]]) -> str:
 
 
 def within_rate_limit(user: Any) -> bool:
-    # shortcut: the default cache is per process (2 gunicorn workers), so the real cap is up
-    # to 2x; move to a shared cache if that matters.
-    key = f"assistant:{user.pk}"
-    cache.add(key, 0, timeout=60 * 60)
-    try:
-        return int(cache.incr(key)) <= RATE_LIMIT
-    except ValueError:  # the window expired between add() and incr()
-        return True
+    return ratelimit.hit(f"assistant:{user.pk}", 60 * 60) <= RATE_LIMIT
 
 
 def fallback(field: dict[str, Any] | None, note: str) -> JsonResponse:

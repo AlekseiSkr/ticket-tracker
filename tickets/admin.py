@@ -34,11 +34,12 @@ STATUS_COLORS = {
 }
 P = Ticket.Priority
 PRIORITY_COLORS = {P.URGENT: "danger", P.HIGH: "warning", P.NORMAL: "neutral", P.LOW: "neutral"}
-
-
-def agent_for(user: Any) -> Agent:
-    """Staff who write comments or claim tickets need an Agent profile; create it on first use."""
-    return Agent.objects.get_or_create(user=user)[0]
+# Lead-only bulk actions: action -> (permission it needs, the action bar picker it uses).
+LEAD_ACTIONS: dict[str, tuple[str, str | None]] = {
+    "assign_selected": ("assign_ticket", "agent"),
+    "close_selected": ("close_ticket", None),
+    "priority_selected": ("change_priority", "priority"),
+}
 
 
 class TicketActionForm(ActionForm):
@@ -86,7 +87,7 @@ class CommentFormSet(BaseInlineFormSet):
         # The current agent writes every new comment. Set it before validation so the
         # "internal notes need an agent" constraint passes; only on a real submit.
         if self.is_bound and form.instance.pk is None:
-            form.instance.author = agent_for(self.request_user)
+            form.instance.author = Agent.for_user(self.request_user)
         return form
 
 
@@ -262,26 +263,25 @@ class TicketAdmin(ModelAdmin):
             fields.append("priority")
         return fields
 
+    def _denied_lead_actions(self, request: HttpRequest) -> list[tuple[str, str | None]]:
+        return [
+            (name, picker)
+            for name, (perm, picker) in LEAD_ACTIONS.items()
+            if not request.user.has_perm(f"tickets.{perm}")
+        ]
+
     def changelist_view(self, request: HttpRequest, extra_context: Any = None) -> Any:
         response = super().changelist_view(request, extra_context)
-        # The action bar's pickers belong to Lead-only actions; drop them with the actions.
         form = getattr(response, "context_data", {}).get("action_form")
-        if form is not None:
-            if not request.user.has_perm("tickets.assign_ticket"):
-                form.fields.pop("agent", None)
-            if not request.user.has_perm("tickets.change_priority"):
-                form.fields.pop("priority", None)
+        for _, picker in self._denied_lead_actions(request):
+            if form is not None and picker:
+                form.fields.pop(picker, None)  # the picker goes with its action
         return response
 
     def get_actions(self, request: HttpRequest) -> dict[str, Any]:
         actions = super().get_actions(request)
-        for name, perm in [
-            ("assign_selected", "assign_ticket"),
-            ("close_selected", "close_ticket"),
-            ("priority_selected", "change_priority"),
-        ]:
-            if not request.user.has_perm(f"tickets.{perm}"):
-                actions.pop(name, None)
+        for name, _ in self._denied_lead_actions(request):
+            actions.pop(name, None)
         return actions
 
     def get_search_results(
@@ -367,7 +367,7 @@ class TicketAdmin(ModelAdmin):
 
     @admin.action(description="Claim selected tickets")
     def claim_selected(self, request: HttpRequest, queryset: QuerySet[Ticket]) -> None:
-        agent = agent_for(request.user)
+        agent = Agent.for_user(request.user)
         self._bulk(request, queryset, "claimed", lambda t: t.claim(agent))
 
     @admin.action(description="Resolve selected tickets")
@@ -424,7 +424,7 @@ class TicketAdmin(ModelAdmin):
 
     @action(description="Claim", url_path="claim", icon="front_hand")
     def claim_detail(self, request: HttpRequest, object_id: str) -> HttpResponseRedirect:
-        agent = agent_for(request.user)
+        agent = Agent.for_user(request.user)
         return self._detail(
             request, object_id, lambda t: t.claim(agent), "You claimed this ticket."
         )
