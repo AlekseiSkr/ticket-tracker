@@ -17,7 +17,8 @@
   and some SLA breaches
 - **about 61k comments** (about 2.4 per ticket), 5% with attachments that reuse three sample files
 
-`seed_users` creates one login per role, with passwords from env vars. The seed never
+`seed_users` creates a Lead and an Agent login for each of the two reviewers, each with its own
+password from an env var. The seed never
 touches user accounts.
 
 ## Why
@@ -32,7 +33,7 @@ destructive button in production is a smell.
 - **Seeding on every deploy:** would wipe reviewers' changes mid-review.
 
 ## How it's set up
-- **Local:** set `DEMO_LEAD_PASSWORD` and `DEMO_AGENT_PASSWORD` in `.env`, then run
+- **Local:** copy the four `DEMO_*_PASSWORD` placeholders from `.env.example` into `.env`, then run
   `docker compose exec web python manage.py seed_users` and
   `docker compose exec web python manage.py seed_demo --reset`. About 30 s for 25k tickets.
 - **Production (first time):** `fly ssh console -C "python manage.py seed_users"` (passwords

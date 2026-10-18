@@ -44,7 +44,7 @@ Indexes on `(status, priority)` and `(assignee, status)`.
 | Files | Private S3 bucket: SeaweedFS locally, Cloudflare R2 (EU) in production | [file-storage.md](features/file-storage.md) |
 | Hosting | Fly.io `fra`, always on, 512 MB | [hosting-fly.md](features/hosting-fly.md) |
 | AI | Groq `openai/gpt-oss-20b`, falls back to showing help_text | [ai-form-assistant.md](features/ai-form-assistant.md) |
-| Auth | Django auth (Argon2), GitHub OAuth via allauth | [authentication-and-roles.md](features/authentication-and-roles.md) |
+| Auth | Django auth (Argon2); pre-made reviewer accounts (OAuth dropped 2026-10-18) | [authentication-and-roles.md](features/authentication-and-roles.md) |
 | Ops | GitHub Actions CI/CD, Sentry, health checks | [ci-cd.md](features/ci-cd.md), [error-monitoring.md](features/error-monitoring.md), [health-checks.md](features/health-checks.md) |
 
 ## Phases
@@ -55,7 +55,7 @@ Indexes on `(status, priority)` and `(assignee, status)`.
 | 1. Core | Models, constraints, rules, admin (lists, filters, search, inlines, actions), roles, uploads, seed. **Tag v0.1, deployed** | **Done 2026-10-18** (v0.1) |
 | 2. Tests + CI/CD | Rule matrix, concurrency, role leak sweep, seed invariants; deploy on green | **Done 2026-10-18** (v0.2: 76 tests, 95% coverage, CI gate at 93%) |
 | 3. AI assistant | Grounded chat with a fallback | — |
-| 4. OAuth | GitHub login, approval-gated | — |
+| 4. OAuth | GitHub login, approval-gated | **Dropped 2026-10-18:** Benrey wants pre-made accounts for two reviewers |
 | 5. Hardening | CSP, Sentry, runbook, final README. **v1.0** | — |
 | 6. Polish (optional) | Role-aware dashboard | — |
 
@@ -68,7 +68,7 @@ Indexes on `(status, priority)` and `(assignee, status)`.
 | S3 | django-storages + R2 (EU) | Private upload; presigned 200 then 403 after expiry; nothing on disk |
 | S4 | Unfold + chat widget + CSP | Widget on every change form, no CSP violations |
 | S5 | Groq | ≥ 1K requests/day; p95 < 3 s; fallback within 9 s |
-| S6 | allauth behind Fly | Rate limits key on `Fly-Client-IP` |
+| S6 | ~~allauth behind Fly~~ (dropped with OAuth) | The Phase 5 login rate limit keys on `Fly-Client-IP` |
 | S7 | Seed into Neon | < 3 min; changelist ≤ 15 queries per page |
 | S8 | Agent isolation sweep | No other agents' tickets or hidden fields anywhere |
 | S9 | 512 MB memory | RSS < 400 MB under 20 users |

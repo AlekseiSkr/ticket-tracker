@@ -16,7 +16,7 @@ Requires Docker Desktop.
 cp .env.example .env
 docker compose up -d --build
 docker compose exec web python manage.py createsuperuser
-# Demo data: set DEMO_LEAD_PASSWORD and DEMO_AGENT_PASSWORD in .env first
+# Demo data: needs the four DEMO_*_PASSWORD values in .env (see .env.example)
 docker compose exec web python manage.py seed_users
 docker compose exec web python manage.py seed_demo --reset
 ```

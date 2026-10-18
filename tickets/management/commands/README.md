@@ -11,7 +11,7 @@
 | **Depends on** | [../../../docs/features/demo-data.md](../../../docs/features/demo-data.md) |
 
 ## What
-- `seed_users` creates or updates the two demo logins, `lead` (Support Lead) and `agent` (Agent), with Agent profiles. Passwords come from `DEMO_LEAD_PASSWORD` and `DEMO_AGENT_PASSWORD` and must pass Django's password validators.
+- `seed_users` creates or updates the reviewer logins: `lead-1`, `agent-1`, `lead-2` and `agent-2`, each with an Agent profile. Each has its own password from `DEMO_<ROLE>_<N>_PASSWORD`, which must pass Django's password validators.
 - `seed_demo [--reset] [--seed 42] [--tickets 25000]` bulk-creates demo data:
   - 25 agents, about 4k customers and 40 tags;
   - tickets in workflow-consistent states, with about 10% SLA breaches;
@@ -29,10 +29,10 @@
 ## How it's set up
 | File | Role |
 |---|---|
-| `seed_users.py` | The two demo accounts. |
+| `seed_users.py` | A Lead and an Agent account for each of the two reviewers. |
 | `seed_demo.py` | Demo data. `--reset` deletes tickets, comments, customers, tags and the `seed-*` agent users; real accounts stay. |
 
-Order: run `seed_users` first, so the demo `agent` also gets open tickets.
+Order: run `seed_users` first, so the reviewer Agent accounts also get open tickets.
 
 ## Who owns what
 - **Demo passwords:** password manager and Fly secrets.
