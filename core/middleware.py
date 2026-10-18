@@ -34,3 +34,29 @@ class HealthCheckMiddleware:
             logger.exception("Readiness check failed: database unreachable")
             return JsonResponse({"status": "unavailable", "database": "down"}, status=503)
         return JsonResponse({"status": "ok", "database": "up"})
+
+
+# Unfold's Alpine.js build evaluates its x-data expressions, hence 'unsafe-eval'. Inline
+# scripts stay blocked; inline styles are allowed because Unfold's templates use them.
+CSP = "; ".join(
+    [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-eval'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data:",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+    ]
+)
+
+
+class ContentSecurityPolicyMiddleware:
+    def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]) -> None:
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest) -> HttpResponse:
+        response = self.get_response(request)
+        response.headers.setdefault("Content-Security-Policy", CSP)
+        return response

@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import dj_database_url
+import sentry_sdk
 from django.templatetags.static import static
 
 from config.env import env_bool, env_int, env_list, optional_env, require_env
@@ -33,6 +34,7 @@ MIDDLEWARE = [
     # because platform health checks hit the machine directly over plain HTTP.
     "core.middleware.HealthCheckMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "core.middleware.ContentSecurityPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -139,6 +141,12 @@ LLM_BASE_URL = optional_env("LLM_BASE_URL")
 LLM_MODEL = optional_env("LLM_MODEL")
 GROQ_API_KEY = optional_env("GROQ_API_KEY")
 
+# --- Error monitoring (docs/features/error-monitoring.md) ------------------------
+# Off while SENTRY_DSN is blank (local, CI). No personal data: no user, IP, cookies or request
+# bodies, so ticket and customer text never leaves for Sentry.
+if SENTRY_DSN := optional_env("SENTRY_DSN"):
+    sentry_sdk.init(dsn=SENTRY_DSN, send_default_pii=False, max_request_body_size="never")
+
 # --- Logging ------------------------------------------------------------------
 LOGGING = {
     "version": 1,
@@ -205,7 +213,10 @@ UNFOLD = {
     ],
     # "/" only redirects back to the admin, so a "Return to site" link would be a dead loop.
     "SITE_URL": None,
-    "LOGIN": {"image": lambda request: static("core/login-panel.svg")},
+    "LOGIN": {
+        "image": lambda request: static("core/login-panel.svg"),
+        "form": "core.forms.RateLimitedLoginForm",  # 10 failures per IP, then 15 min
+    },
     "ENVIRONMENT": "core.admin_ui.environment_callback",
     # Model search (COMMAND.search_models) stays off: it lists str(obj) for every searchable
     # model, which would bypass per-role field hiding once the ticket admins exist.

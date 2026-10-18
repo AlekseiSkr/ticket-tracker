@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Live (88 tests passing, 95% coverage, on 2026-10-18), plus one on-demand stress test |
+| **Status**   | Live (91 tests passing, 95% coverage, on 2026-10-18), plus one on-demand stress test |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-18 |
@@ -35,6 +35,7 @@ invariants.
 | `test_admin_theme.py` | Dark theme, lime primary, self-hosted fonts, favicon and login art; no dead "Return to site"; skip link before the sidebar; dashboard greeting; Unfold auth admins; branded 404; "Local" badge only under `DEBUG`. |
 | `test_tickets.py` | The full transition matrix (all 25 status pairs); workflow rules and first-response stamping; WIP cap and a two-thread concurrent claim (exactly one wins); the Agent leak sweep (list, change, history, delete and every workflow-button URL of another agent's ticket, customer inline, attachment, the assignee autocomplete, WIP caps never shown); Lead bulk assign, priority and close; role-hidden actions, pages and fields; internal note via the admin form; bulk-action skip messages; upload validation and the 11 MB request cap; seed invariants; changelist ≤ 15 queries, and the ids-first paginator keeps sorted rows in order. |
 | `test_stress.py` | **On demand only** (marker `stress`, excluded by default). Seeds `STRESS_TICKETS` tickets (default 25,000) into the throwaway test DB. Then it prints p50/p95/max, query count and page size for 16 Lead and Agent pages, bulk-claim time, an 8-agent race on one ticket (exactly one winner), assistant overhead with the LLM mocked, table sizes and peak memory. Fails if any page goes over `STRESS_P95_MS` (default 1500) or 20 queries. |
+| `test_security.py` | Ten failed logins block the IP, even for the right password, while another IP still logs in; the CSP blocks inline and foreign scripts. |
 | `test_storage.py` | URLs are presigned (60 s); the public endpoint is used when set. |
 | `test_ensure_bucket.py` | Creates the bucket only on a 404 with `--create`; never on 403. |
 
