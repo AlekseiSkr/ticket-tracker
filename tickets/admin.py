@@ -338,6 +338,11 @@ class TicketAdmin(ModelAdmin):
 
     # --- Workflow buttons on the ticket page -----------------------------------------------
 
+    def has_close_ticket_permission(self, request: HttpRequest, obj: Any = None) -> bool:
+        # A method, not "tickets.close_ticket": Unfold checks dotted permissions with a DB query
+        # at startup, which fails on a fresh database (CI's makemigrations --check).
+        return bool(request.user.has_perm("tickets.close_ticket"))
+
     def _detail(
         self, request: HttpRequest, object_id: str, apply: Callable[[Ticket], None], done: str
     ) -> HttpResponseRedirect:
@@ -384,9 +389,7 @@ class TicketAdmin(ModelAdmin):
             "Ticket resolved.",
         )
 
-    @action(
-        description="Close", url_path="close", icon="lock", permissions=["tickets.close_ticket"]
-    )
+    @action(description="Close", url_path="close", icon="lock", permissions=["close_ticket"])
     def close_detail(self, request: HttpRequest, object_id: str) -> HttpResponseRedirect:
         return self._detail(
             request, object_id, lambda t: t.transition_to(S.CLOSED, request.user), "Ticket closed."

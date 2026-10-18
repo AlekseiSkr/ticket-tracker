@@ -228,14 +228,17 @@ def test_agent_lacks_lead_actions_pages_and_fields(client, customer, agent):
         and 'name="assignee"' not in form
         and 'name="status"' not in form
     )
+    assert f"/{ticket.pk}/close/" not in form  # the Close workflow button is lead-only
 
 
 def test_lead_sees_lead_actions(client, customer, lead):
-    ticket_for(customer)
+    ticket = ticket_for(customer)
     client.force_login(lead)
     listing = client.get("/admin/tickets/ticket/", secure=True).content.decode()
     for action in ("assign_selected", "close_selected", "priority_selected"):
         assert f'value="{action}"' in listing
+    form = client.get(f"/admin/tickets/ticket/{ticket.pk}/change/", secure=True).content.decode()
+    assert f"/{ticket.pk}/close/" in form
 
 
 def test_agent_writes_an_internal_note_through_the_form(client, customer, agent):
