@@ -211,6 +211,8 @@ def test_agent_lacks_lead_actions_pages_and_fields(client, customer, agent):
     assert 'value="claim_selected"' in listing
     for lead_only in ("assign_selected", "close_selected", "priority_selected", "delete_selected"):
         assert f'value="{lead_only}"' not in listing
+    # ...and the action bar's agent and priority pickers that only those actions use.
+    assert 'name="agent"' not in listing and 'name="priority"' not in listing
     for page in ("/admin/tickets/agent/", "/admin/auth/user/", "/admin/auth/group/"):
         assert client.get(page, secure=True).status_code == 403
     form = client.get(f"/admin/tickets/ticket/{ticket.pk}/change/", secure=True).content.decode()
@@ -228,29 +230,68 @@ def test_lead_sees_lead_actions(client, customer, lead):
     listing = client.get("/admin/tickets/ticket/", secure=True).content.decode()
     for action in ("assign_selected", "close_selected", "priority_selected"):
         assert f'value="{action}"' in listing
+    assert 'name="agent"' in listing and 'name="priority"' in listing
     form = client.get(f"/admin/tickets/ticket/{ticket.pk}/change/", secure=True).content.decode()
     assert f"/{ticket.pk}/close/" in form
 
 
-def test_agent_writes_an_internal_note_through_the_form(client, customer, agent):
-    ticket = ticket_for(customer, agent.agent, status=S.OPEN)
-    client.force_login(agent)
-    data = {
+def change_form_data(ticket, **extra):
+    return {
         "subject": ticket.subject,
         "description": ticket.description,
-        "customer": customer.pk,
+        "customer": ticket.customer_id,
         "channel": ticket.channel,
         "comments-TOTAL_FORMS": "1",
         "comments-INITIAL_FORMS": "0",
         "comments-MIN_NUM_FORMS": "0",
         "comments-MAX_NUM_FORMS": "1000",
-        "comments-0-body": "Escalated to tier 2.",
-        "comments-0-is_internal": "on",
+        **extra,
     }
+
+
+def test_agent_writes_an_internal_note_through_the_form(client, customer, agent):
+    ticket = ticket_for(customer, agent.agent, status=S.OPEN)
+    client.force_login(agent)
+    data = change_form_data(
+        ticket, **{"comments-0-body": "Escalated to tier 2.", "comments-0-is_internal": "on"}
+    )
     response = client.post(f"/admin/tickets/ticket/{ticket.pk}/change/", data, secure=True)
     assert response.status_code == 302, response.content.decode()[:2000]
     note = ticket.comments.get()
     assert note.is_internal and note.author == agent.agent
+
+
+def test_agent_logs_a_customer_reply_through_the_form(client, customer, agent):
+    ticket = ticket_for(customer, agent.agent, status=S.PENDING_CUSTOMER)
+    client.force_login(agent)
+    url = f"/admin/tickets/ticket/{ticket.pk}/change/"
+    customer_note = {"comments-0-from_customer": "on", "comments-0-is_internal": "on"}
+    data = change_form_data(ticket, **{"comments-0-body": "Still broken.", **customer_note})
+    assert client.post(url, data, secure=True).status_code == 200  # can't be an internal note
+    assert not ticket.comments.exists()
+
+    del data["comments-0-is_internal"]
+    assert client.post(url, data, secure=True).status_code == 302
+    message = ticket.comments.get()
+    assert message.author is None and not message.is_internal
+    ticket.refresh_from_db()
+    assert ticket.first_response_at is None  # a customer's message isn't the agent's response
+    page = client.get(url, secure=True)
+    assert page.status_code == 200 and "Customer" in page.content.decode()
+
+
+def test_lead_cannot_assign_past_the_rules_through_the_form(client, customer, lead, agent):
+    agent.agent.max_open_tickets = 1
+    agent.agent.save()
+    ticket_for(customer, agent.agent, status=S.OPEN)  # the agent is at their cap
+    ticket = ticket_for(customer)
+    client.force_login(lead)
+    url = f"/admin/tickets/ticket/{ticket.pk}/change/"
+    assert 'name="assignee"' not in client.get(url, secure=True).content.decode()
+    data = change_form_data(ticket, priority=ticket.priority, assignee=agent.agent.pk)
+    assert client.post(url, data, secure=True).status_code == 302
+    ticket.refresh_from_db()
+    assert ticket.assignee is None  # only Claim and the Assign action, with the cap, set it
 
 
 def test_bulk_claim_reports_skips(client, customer, agent):

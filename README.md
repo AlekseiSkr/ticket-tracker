@@ -27,7 +27,7 @@ Detail lives in [docs/](docs/README.md):
 |---|---|---|
 | Dashboard | Greeting and the sections this user may open | Both |
 | Tickets list | Filters: queue (mine / unassigned), status, priority, SLA breached, channel, tags. Search: `#id`, subject, customer. Bulk actions: claim and resolve; Leads also get assign, set priority and close. Columns sort by SLA, age and comment count. | Both; an Agent's list is limited |
-| Ticket page | Fields plus the workflow buttons (claim, waiting on customer, resolve, close, reopen). Comments inline: public replies or internal notes, with attachments. SLA deadline and history. | Both |
+| Ticket page | Fields plus the workflow buttons (claim, waiting on customer, resolve, close, reopen). Comments inline: public replies, internal notes, or a message logged from the customer, with attachments. Assignee and status are read-only here; they change only through the buttons and bulk actions, which apply the rules. SLA deadline and history. | Both |
 | Customers | Contact details with their tickets inline | Both; only Leads delete |
 | Agents | Team, work-in-progress cap and open-ticket count | Leads |
 | Tags, Users, Groups | Lookups and accounts | Leads manage tags and users; Agents only view tags |
@@ -51,6 +51,12 @@ tickets the user may see. `/healthz` and `/readyz` are for the platform's health
   Policy allows only the app's own scripts. Errors go to Sentry without personal data.
 
 ## Stack
+
+**Why Django:** its built-in admin generates exactly what this brief is about: list filters,
+search, true inline formsets, permission-aware actions and per-request hooks that hide
+fields by role. That left the time for the rules, roles and tests instead of UI plumbing.
+Python is also one of the backend languages the role lists.
+
 | Layer | Choice |
 |---|---|
 | App | Django 5.2 LTS, Python 3.13, uv |
@@ -119,5 +125,27 @@ At 25,000 tickets, most admin pages answer in 0.1–0.3 s (median), each in 11 q
 
 **Known limits:**
 - The login and assistant limits are counted per gunicorn process, so with two workers the
-  real limits are up to twice the set values.
+  real limits are up to twice the set values. A deploy restarts the process and resets them.
 - The CSP still allows `'unsafe-eval'`, because Unfold's Alpine.js needs it.
+
+## Deliberately skipped
+| Skipped | Why |
+|---|---|
+| GitHub OAuth | The hiring team asked for pre-made reviewer accounts, so nobody signs up. |
+| A customer portal or public API | The brief asks for an API only beyond the admin. Customers' messages are logged by agents ("From the customer" on a comment). |
+| Email ingestion | Real mailbox plumbing for a demo; agents log what customers send instead. |
+| Streaming AI answers | Under WSGI a stream ties up a gunicorn worker for its whole length. Answers are short. |
+| A shared cache (Redis) | One machine; the per-process limits are documented above. |
+| Per-PR preview apps | Each one is a paid Fly machine. |
+| A one-click "Reset demo data" workflow | One documented command does it ([runbook](docs/runbook.md)). |
+
+## With more time
+- A shared cache for the login and assistant limits, so they hold across workers and deploys.
+- Assigning from the ticket page itself, through a dialog that applies the same rules as the
+  bulk action. Today a Lead assigns from the list.
+- A customer reply on a ticket waiting on the customer reopens it automatically.
+- Resolution-time SLAs and breach alerts, not just first response.
+- Browser tests (Playwright) of each role's screens, on top of the HTML assertions.
+- Drop `'unsafe-eval'` from the CSP once Unfold ships a CSP-safe Alpine build.
+- A small set of graded questions for the AI assistant, to catch answers that drift from
+  the form.

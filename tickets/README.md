@@ -5,7 +5,7 @@
 | **Status**   | Live (Phase 1, v0.1) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-18 |
+| **Updated**  | 2026-10-19 |
 | **Where**    | `tickets/` (Django app `tickets`, admin section "Support") |
 | **Cost**     | $0 |
 | **Depends on** | [../docs/plan.md](../docs/plan.md), [../docs/features/admin-ui.md](../docs/features/admin-ui.md), [../docs/features/authentication-and-roles.md](../docs/features/authentication-and-roles.md) |
@@ -55,7 +55,8 @@ No credentials.
 
 ## Gotchas
 - **Hiding a field from Agents means removing it everywhere:** fields, list display, filters, search, autocomplete, error messages and the AI context. The leak-sweep test enforces this for tickets.
-- **Comments are an append-only log.** The inline allows adding but never editing or deleting. The current user's Agent profile is set as the author before validation, so internal notes pass the "needs an agent" constraint.
+- **Comments are an append-only log.** The inline allows adding but never editing or deleting. The current user's Agent profile is set as the author before validation, so internal notes pass the "needs an agent" constraint. Ticking "From the customer" clears the author instead, to log a message the customer sent; such a message can't be internal.
+- **Assignee and status are read-only in the ticket form, for every role.** They change only through the workflow buttons and bulk actions, so the work-in-progress cap always applies.
 - **Unfold badge maps must list every value.** A missing key shows the raw value (`pending_customer`) instead of the label.
 - **Locks are always taken ticket first, then agent,** so concurrent claims can't deadlock.
 

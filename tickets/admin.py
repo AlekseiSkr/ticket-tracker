@@ -90,11 +90,37 @@ class CommentFormSet(BaseInlineFormSet):
         return form
 
 
+class CommentForm(forms.ModelForm):
+    from_customer = forms.BooleanField(
+        required=False,
+        label="From the customer",
+        help_text="Tick to log a message the customer sent by email, chat or phone.",
+    )
+
+    def clean(self) -> dict[str, Any]:
+        super().clean()
+        cleaned = self.cleaned_data
+        if cleaned.get("from_customer"):
+            if cleaned.get("is_internal"):
+                raise ValidationError("A customer's message can't be an internal note.")
+            self.instance.author = None  # the formset set the current agent; this overrides it
+        return cleaned
+
+
 class CommentInline(StackedInline):
     model = Comment
+    form = CommentForm
     formset = CommentFormSet
     extra = 1
-    fields = ["body", "is_internal", "attachment", "written_by", "attachment_link", "posted_at"]
+    fields = [
+        "body",
+        "from_customer",
+        "is_internal",
+        "attachment",
+        "written_by",
+        "attachment_link",
+        "posted_at",
+    ]
     readonly_fields = ["written_by", "attachment_link", "posted_at"]
 
     def get_formset(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> Any:
@@ -220,9 +246,11 @@ class TicketAdmin(ModelAdmin):
         return qs.annotate(num_comments=Coalesce(num_comments, 0))
 
     def get_readonly_fields(self, request: HttpRequest, obj: Any = None) -> list[str]:
-        # Status only moves through the workflow buttons and actions.
+        # Status and assignee only change through the workflow buttons and actions, which call
+        # the model's rules (the work-in-progress cap, no reassigning resolved tickets).
         fields = [
             "status",
+            "assignee",
             "sla_due_display",
             "sla_state",
             "created_at",
@@ -232,9 +260,18 @@ class TicketAdmin(ModelAdmin):
         ]
         if not request.user.has_perm("tickets.change_priority"):
             fields.append("priority")
-        if not request.user.has_perm("tickets.assign_ticket"):
-            fields.append("assignee")
         return fields
+
+    def changelist_view(self, request: HttpRequest, extra_context: Any = None) -> Any:
+        response = super().changelist_view(request, extra_context)
+        # The action bar's pickers belong to Lead-only actions; drop them with the actions.
+        form = getattr(response, "context_data", {}).get("action_form")
+        if form is not None:
+            if not request.user.has_perm("tickets.assign_ticket"):
+                form.fields.pop("agent", None)
+            if not request.user.has_perm("tickets.change_priority"):
+                form.fields.pop("priority", None)
+        return response
 
     def get_actions(self, request: HttpRequest) -> dict[str, Any]:
         actions = super().get_actions(request)
