@@ -8,7 +8,7 @@
 | **Updated**  | 2026-10-15 |
 | **Where**    | Served by WhiteNoise at `/static/core/` |
 | **Cost**     | $0 |
-| **Depends on** | [../../../DESIGN.md](../../../DESIGN.md), [../../../docs/features/design-language.md](../../../docs/features/design-language.md) |
+| **Depends on** | [../../../docs/DESIGN.md](../../../docs/DESIGN.md), [../../../docs/features/design-language.md](../../../docs/features/design-language.md) |
 
 ## What
 The admin's design-system assets, loaded through `UNFOLD` settings.

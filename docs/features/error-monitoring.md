@@ -2,10 +2,10 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Live in code (2026-10-18); off until `SENTRY_DSN` is set on Fly |
+| **Status**   | Live (2026-10-19): `SENTRY_DSN` set on Fly, uptime monitor on `/healthz` passing |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-18 |
+| **Updated**  | 2026-10-19 |
 | **Where**    | Sentry (Developer plan), project `ticket-tracker`, EU data region |
 | **Cost**     | $0 (Developer: 5k errors/mo, 1 uptime monitor, 30-day retention) |
 | **Depends on** | [hosting-fly.md](hosting-fly.md), [health-checks.md](health-checks.md) |
@@ -44,4 +44,4 @@ useful while you're watching them.
 
 ## Open items
 - [x] SDK wired in (2026-10-18, `sentry-sdk` in `pyproject.toml`).
-- [ ] Create the Sentry project, set `SENTRY_DSN` on Fly and add the `/healthz` uptime monitor (Aleksei).
+- [x] Create the Sentry project, set `SENTRY_DSN` on Fly and add the `/healthz` uptime monitor (done by Aleksei by 2026-10-19).
