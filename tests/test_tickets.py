@@ -273,10 +273,18 @@ def test_attachment_validation(name, data, ok):
             validate_attachment(upload)
 
 
-def test_attachment_size_cap():
+def test_attachment_size_cap(client, customer, agent, settings):
     upload = SimpleUploadedFile("big.txt", b"a" * (MAX_ATTACHMENT_BYTES + 1))
     with pytest.raises(ValidationError, match="10 MB"):
         validate_attachment(upload)
+    # Over the request cap, the save is refused instead of dropping the file and saving the rest.
+    settings.FILE_UPLOAD_MAX_MEMORY_SIZE = 1024
+    ticket = ticket_for(customer, agent.agent, status=S.OPEN)
+    client.force_login(agent)
+    big = SimpleUploadedFile("big.txt", b"a" * 2048)
+    url = f"/admin/tickets/ticket/{ticket.pk}/change/"
+    response = client.post(url, {"comments-0-attachment": big}, secure=True)
+    assert response.status_code == 400 and "10 MB" in response.content.decode()
 
 
 # --- Seed ----------------------------------------------------------------------------------
@@ -327,6 +335,11 @@ def test_changelist_query_budget(client, db, lead, django_assert_max_num_queries
     client.force_login(lead)
     with django_assert_max_num_queries(15):
         assert client.get("/admin/tickets/ticket/", secure=True).status_code == 200
+    # The ids-first paginator shows the same rows, in the same order, as plain slicing.
+    response = client.get("/admin/tickets/ticket/?o=-9.1&p=3", secure=True)
+    shown = [t.pk for t in response.context["cl"].result_list]
+    expected = response.context["cl"].queryset.values_list("pk", flat=True)[100:150]
+    assert shown == list(expected) and len(shown) == 50
 
 
 # --- Phase 2: full transition matrix -------------------------------------------------------

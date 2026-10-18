@@ -132,3 +132,13 @@ def test_widget_is_on_every_change_form(client, customer, lead):
     for page in (f"/admin/tickets/customer/{customer.pk}/change/", "/admin/tickets/ticket/add/"):
         html = client.get(page, secure=True).content.decode()
         assert 'class="assistant"' in html and "core/assistant.js" in html, page
+
+
+def test_field_list_offers_read_only_dropdown_and_inline_fields(client, customer, agent):
+    ticket = ticket_for(customer, agent.agent, status="open")
+    client.force_login(agent)
+    html = client.get(f"/admin/tickets/ticket/{ticket.pk}/change/", secure=True).content.decode()
+    start = html.index('id="assistant-field"')
+    picker = html[start : html.index("</select>", start)]
+    for name in ("status", "priority", "customer", "tags", "body"):  # read-only, dropdowns, inline
+        assert f'value="{name}"' in picker, name

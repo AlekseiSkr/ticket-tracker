@@ -1,15 +1,14 @@
-// AI form assistant panel (templates/admin/change_form.html). It sends the question and the
-// last field the user clicked into to /admin/assistant/. Answers go in as text, never HTML.
+// AI form assistant panel (templates/admin/change_form.html). Sends the question and the chosen
+// field to /admin/assistant/ and shows the answer as text, never HTML.
 (() => {
   const root = document.querySelector(".assistant");
   if (!root) return;
   const panel = root.querySelector(".assistant-panel");
   const toggle = root.querySelector(".assistant-toggle");
+  const fieldSelect = panel.querySelector("#assistant-field");
   const question = panel.querySelector("textarea");
   const ask = panel.querySelector("button[type=submit]");
-  const about = panel.querySelector(".assistant-field");
   const answer = panel.querySelector(".assistant-answer");
-  let field = "";
 
   toggle.addEventListener("click", () => {
     panel.hidden = !panel.hidden;
@@ -17,11 +16,13 @@
     if (!panel.hidden) question.focus();
   });
 
+  // Focusing a field preselects it. Searchable dropdowns focus a widget placed right after
+  // their real <select>, so take the name from there. Disabled and read-only fields can't be
+  // focused; the list still offers them.
   document.getElementById(root.dataset.form)?.addEventListener("focusin", (event) => {
-    if (!event.target.name) return;
-    field = event.target.name.replace(/^.*-\d+-/, ""); // inline inputs: "comments-0-body"
-    const label = document.querySelector(`label[for="${CSS.escape(event.target.id)}"]`);
-    about.textContent = `Asking about: ${(label?.textContent || field).replace("*", "").trim()}`;
+    const input = event.target.name ? event.target : event.target.closest(".select2")?.previousElementSibling;
+    const name = input?.name?.replace(/^.*-\d+-/, ""); // inline inputs are named "comments-0-body"
+    if (name && fieldSelect.querySelector(`option[value="${CSS.escape(name)}"]`)) fieldSelect.value = name;
   });
 
   question.addEventListener("keydown", (event) => {
@@ -46,7 +47,7 @@
           app_label: root.dataset.appLabel,
           model_name: root.dataset.modelName,
           object_id: root.dataset.objectId || null,
-          field,
+          field: fieldSelect.value,
           question: question.value,
         }),
       });

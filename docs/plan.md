@@ -72,4 +72,4 @@ Indexes on `(status, priority)` and `(assignee, status)`.
 | S7 | Seed into Neon | < 3 min; changelist ≤ 15 queries per page |
 | S8 | Agent isolation sweep | No other agents' tickets or hidden fields anywhere |
 | S9 | 512 MB memory | RSS < 400 MB under 20 users |
-| S10 | Upload limits | 9.9 MB works; 10.1 MB gives a form error |
+| S10 | Upload limits | 9.9 MB works; 10.1 MB gives a form error; over 11 MB, a 400 page, never a silent drop |

@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Live in code (2026-10-18); production answers from help text until `GROQ_API_KEY` is set on Fly |
+| **Status**   | Live (2026-10-18), `GROQ_API_KEY` set on Fly |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-18 |
@@ -11,7 +11,9 @@
 | **Depends on** | [admin-ui.md](admin-ui.md), [authentication-and-roles.md](authentication-and-roles.md) |
 
 ## What
-An "Ask about this form" panel on every admin add and change page. It answers "what does this field mean / how do I fill this in" for the field you last clicked into.
+An "Ask about this form" panel on every admin add and change page. It answers "what does this field mean / how do I fill this in" for the field picked in its **Field** list.
+
+The list is rendered from the admin form itself (fieldsets and inlines), so read-only fields, disabled fields and searchable dropdowns are all listed. Clicking into an editable field or dropdown preselects it. Read-only and disabled fields can't take focus, so you pick those from the list.
 
 It's grounded in the real form, built for the current user (`get_form`, `get_readonly_fields`, `get_fieldsets`, inlines included). The prompt gets:
 - each field's label, help text and required/read-only flag;
@@ -45,7 +47,8 @@ Tests: `tests/test_assistant.py` covers:
 - question scrubbing and the length cap;
 - the rate limit;
 - staff-only access with CSRF;
-- the widget being present.
+- the widget being present;
+- the field list including read-only, dropdown and inline fields.
 
 The leak sweep in `tests/test_tickets.py` also asks the assistant as an Agent.
 
@@ -62,5 +65,5 @@ The leak sweep in `tests/test_tickets.py` also asks the assistant as an Agent.
 - **Timeout:** `shortcut:` the 8 s timeout is per socket read, not total.
 
 ## Open items
-- [ ] Set `GROQ_API_KEY` on Fly (the key is in the password manager since 2026-10-15). Until then, production shows the help-text fallback.
+- [x] Set `GROQ_API_KEY` on Fly (done 2026-10-18).
 - [ ] Confirm the Groq free-plan limits in the console (the docs page shows only Developer plan limits).

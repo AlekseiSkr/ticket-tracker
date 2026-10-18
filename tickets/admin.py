@@ -2,11 +2,12 @@
 
 from collections import Counter
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.paginator import Page, Paginator
 from django.db.models import Count, OuterRef, Q, QuerySet, Subquery
 from django.db.models.functions import Coalesce
 from django.forms import BaseInlineFormSet
@@ -130,6 +131,19 @@ class CommentInline(StackedInline):
         return format_html('<a href="{}">Download</a>', reverse("attachment", args=[comment.pk]))
 
 
+class IdsFirstPaginator(Paginator):
+    """Finds the page's ids first, then annotates only those rows. A plain OFFSET runs the
+    comment-count subquery for every row it skips: the last of 500 pages took over 1.5 s."""
+
+    object_list: QuerySet[Ticket]
+
+    def page(self, number: Any) -> Page:
+        page = super().page(number)
+        ids = cast(QuerySet[Ticket], page.object_list).values("pk")
+        page.object_list = self.object_list.filter(pk__in=ids)
+        return page
+
+
 @admin.register(Ticket)
 class TicketAdmin(ModelAdmin):
     list_display = [
@@ -159,6 +173,7 @@ class TicketAdmin(ModelAdmin):
     date_hierarchy = "created_at"
     list_select_related = ["customer", "assignee__user"]
     list_per_page = 50
+    paginator = IdsFirstPaginator
     show_full_result_count = False  # skips a second COUNT(*) over 25k rows on every page
     autocomplete_fields = ["customer", "assignee", "tags"]
     inlines = [CommentInline]
@@ -196,8 +211,8 @@ class TicketAdmin(ModelAdmin):
     ]
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Ticket]:
-        # A correlated subquery, not Count(): Postgres counts only the rows on the page instead
-        # of grouping every ticket with its comments (about 10x faster at 25k tickets).
+        # A correlated subquery, not Count(): with IdsFirstPaginator, Postgres counts comments
+        # for the 50 rows on the page instead of grouping every ticket with its comments.
         comments = Comment.objects.filter(ticket=OuterRef("pk")).order_by().values("ticket")
         num_comments = Subquery(comments.annotate(n=Count("pk")).values("n"))
         qs = Ticket.objects.visible_to(request.user).with_sla()

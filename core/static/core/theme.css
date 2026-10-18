@@ -134,8 +134,7 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]), select, t
 }
 input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):hover, select:hover, textarea:hover { border-color: var(--edge); }
 input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
-/* Switches: Unfold ships them green and without a focus ring; selection is the one accent. */
-/* Switches are the rounded-full ones; plain checkboxes are appearance-none too. */
+/* Switches (the rounded-full checkboxes): Unfold ships them green; selection is the one accent. */
 input[type="checkbox"].appearance-none.rounded-full:checked { background-color: var(--lime-signal); }
 input[type="checkbox"].appearance-none.rounded-full:checked::after { background-color: var(--panel); }
 ::placeholder { color: var(--subtle); }
@@ -185,12 +184,11 @@ input[type="checkbox"].appearance-none.rounded-full:checked::after { background-
 }
 .assistant-panel[hidden] { display: none; }
 .assistant-panel label { font-size: .75rem; color: var(--muted); }
-.assistant-panel textarea {
+.assistant-panel textarea, .assistant-panel select {
   width: 100%; padding: 8px 12px; border: 1px solid var(--divider); border-radius: 8px;
   color: var(--heading); font: 400 .875rem/1.4 var(--font-sans); resize: vertical;
 }
 .assistant-panel button { align-self: flex-end; }
-.assistant-field { color: var(--subtle); font: 400 .75rem/1.25rem var(--font-mono); }
 .assistant-answer { max-height: 40vh; overflow-y: auto; color: var(--heading); font-size: .875rem; line-height: 1.5; white-space: pre-line; }
 .assistant-answer:empty { display: none; }
 

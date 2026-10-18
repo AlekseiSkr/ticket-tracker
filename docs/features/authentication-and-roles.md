@@ -12,7 +12,7 @@
 
 ## What
 Login goes through Django's own auth:
-- passwords are hashed with **Argon2** (PBKDF2 kept as a fallback);
+- passwords are hashed with Django's default, **PBKDF2**;
 - sessions are DB-backed and last 8 h;
 - cookies are Secure, HttpOnly and SameSite=Lax.
 
@@ -59,7 +59,9 @@ Separate accounts per reviewer, rather than one shared login per role, keep each
 
 ## Gotchas
 - **Hiding a field isn't enough.** It must also be removed from `search_fields`, list filters, autocomplete results, error messages and the AI context. A leak-sweep test logs in as an Agent and checks every admin URL.
-- **The admin login has no rate limit.** OAuth's allauth `secure_admin_login` was going to provide one, and it went with OAuth. Until Phase 5 adds one, the only defences are strong passwords and Argon2.
+- **The admin login has no rate limit.** OAuth's allauth `secure_admin_login` was going to provide one, and it went with OAuth. Until Phase 5 adds one, the only defence is strong passwords.
+- **Not Argon2 (switched 2026-10-18).** Django's Argon2 settings take 100 MB of memory per hash, and Django hashes even for unknown usernames. About six parallel anonymous login attempts would push the 512 MB VM out of memory. PBKDF2 is CPU-bound, with no memory spike. Existing Argon2 hashes still verify (`argon2-cffi` stays installed) and are rehashed to PBKDF2 at the next login. Rerunning `seed_users` rehashes the reviewer accounts at once.
+  **Rejected:** keeping Argon2 with a lower `memory_cost` (a custom hasher subclass to maintain).
 
 ## Open items
 - [x] **Benrey answered (2026-10-18):** pre-made accounts only, for two reviewers.

@@ -5,7 +5,7 @@
 | **Status**   | Live |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-15 |
+| **Updated**  | 2026-10-18 |
 | **Where**    | `TEMPLATES["DIRS"]` in `config/settings.py` (searched before app templates) |
 | **Cost**     | $0 |
 | **Depends on** | [../DESIGN.md](../DESIGN.md), [../docs/features/design-language.md](../docs/features/design-language.md) |
@@ -25,7 +25,7 @@ upgrades keep flowing through.
 | File | Role |
 |---|---|
 | `_error.html` | Standalone base for error pages: self-hosted fonts, inline CSS, a lit line, one link back to the admin. |
-| `404.html` / `500.html` | Copy blocks only. Django uses them when `DEBUG` is off. |
+| `400.html` / `404.html` / `500.html` | Copy blocks only. Django uses them when `DEBUG` is off. The 400 page mostly means an upload over 11 MB. |
 | `admin/` | Admin overrides. |
 
 Tests: `tests/test_admin_theme.py` (404 page, skip link, greeting).
