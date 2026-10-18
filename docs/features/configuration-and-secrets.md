@@ -39,6 +39,8 @@ or local disk. Silent fallbacks are a classic production bug, and the brief call
   - `S3_PUBLIC_ENDPOINT_URL`, `S3_REGION` (default `auto`), `S3_ADDRESSING_STYLE` (default `virtual`)
   - `DB_CONN_MAX_AGE` (default 60)
   - `LOG_LEVEL`
+  - `LLM_BASE_URL`, `LLM_MODEL` (in `fly.toml [env]`) and `GROQ_API_KEY` (a secret). If any is blank,
+    the form assistant answers from the field's help text instead of failing.
 - **Command-only variables** (read by `seed_users`, not by the app at startup):
   - `DEMO_LEAD_1_PASSWORD`, `DEMO_AGENT_1_PASSWORD`, `DEMO_LEAD_2_PASSWORD`,
     `DEMO_AGENT_2_PASSWORD` (one per reviewer account). Required when the command runs, and they must

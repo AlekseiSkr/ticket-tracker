@@ -170,6 +170,43 @@ input[type="checkbox"].appearance-none.rounded-full:checked::after { background-
 .dashboard-meta { position: relative; padding-top: 16px; color: var(--subtle); font: 400 .875rem/1.25rem var(--font-mono); text-transform: uppercase; }
 .dashboard-meta::before { content: ""; position: absolute; left: 0; top: 0; width: 110px; height: 1px; background: var(--lime-ink); box-shadow: var(--lit-glow); }
 
+/* ---- Form assistant (templates/admin/change_form.html, assistant.js) -------------------- */
+/* Bottom right, above Unfold's sticky save bar; the panel opens upward from the toggle. */
+.assistant {
+  position: fixed; right: 16px; bottom: 96px; z-index: 40;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  width: min(380px, calc(100vw - 32px));
+}
+.assistant-toggle, .assistant-panel button {
+  padding: 10px 16px; border-radius: 8px;
+  background: var(--lime-signal); color: var(--panel);
+  font: 600 .75rem/1 var(--font-mono); letter-spacing: -.01em; text-transform: uppercase;
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.assistant-toggle:hover, .assistant-panel button:hover { background: var(--lime-hover); }
+.assistant-panel {
+  display: flex; flex-direction: column; gap: 8px; width: 100%;
+  padding: 16px; border: 1px solid var(--divider); border-radius: 8px; background: var(--panel);
+}
+.assistant-panel[hidden] { display: none; }
+.assistant-panel h2 {
+  position: relative; padding-left: 16px;
+  font: 400 .75rem/1.25rem var(--font-mono); text-transform: uppercase; color: var(--lime-ink);
+}
+.assistant-panel h2::before {
+  content: ""; position: absolute; left: 0; top: 50%; width: 8px; height: 8px; margin-top: -4px;
+  background: var(--lime-ink);
+}
+.assistant-panel label { font-size: .75rem; color: var(--muted); }
+.assistant-panel textarea {
+  width: 100%; padding: 8px 12px; border: 1px solid var(--divider); border-radius: 8px;
+  color: var(--heading); font: 400 .875rem/1.4 var(--font-sans); resize: vertical;
+}
+.assistant-panel button { align-self: flex-end; }
+.assistant-field { color: var(--subtle); font: 400 .75rem/1.25rem var(--font-mono); }
+.assistant-answer { max-height: 40vh; overflow-y: auto; color: var(--heading); font-size: .875rem; line-height: 1.5; white-space: pre-line; }
+.assistant-answer:empty { display: none; }
+
 /* Phones: drop the parent crumbs so the current page title is never truncated. */
 @media (max-width: 767px) {
   #header-inner h1 > a:not(:last-of-type), #header-inner h1 > .material-symbols-outlined { display: none; }

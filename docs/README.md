@@ -56,7 +56,7 @@ The root is covered by [../README.md](../README.md) (run it), [../CLAUDE.md](../
 | CI/CD (GitHub Actions → Fly) | Live | [ci-cd.md](features/ci-cd.md) |
 | Hosting (Fly.io, aleksei-ticket-tracker.fly.dev) | Live | [hosting-fly.md](features/hosting-fly.md) |
 | Authentication and roles | Live (roles, reviewer accounts) | [authentication-and-roles.md](features/authentication-and-roles.md) |
-| AI form assistant (Groq) | Planned | [ai-form-assistant.md](features/ai-form-assistant.md) |
+| AI form assistant (Groq) | Live (fallback until the Fly key is set) | [ai-form-assistant.md](features/ai-form-assistant.md) |
 | Error monitoring (Sentry) | Planned | [error-monitoring.md](features/error-monitoring.md) |
 | Demo data (seed) | Live (commands); reset workflow planned | [demo-data.md](features/demo-data.md) |
 

@@ -28,6 +28,7 @@ allow.
 | `theme.css` | Unlayered overrides on top of Unfold's layered Tailwind CSS: fonts, lime controls, captions, the lit-line nav, browser surfaces. Tokens are custom properties at the top. |
 | `fonts/` | Geist, Geist Mono and Archivo (latin subset, variable woff2) with their `OFL-*.txt` licences, which must ship with the files. |
 | `favicon.svg` | A lime square with a ticket stub (`UNFOLD["SITE_FAVICONS"]`). |
+| `assistant.js` | The form assistant panel: tracks the last-focused field, posts the question with `X-CSRFToken`, shows the answer as text. |
 | `login-panel.svg` | The login side panel: khaki grid and lit line, decorative (`UNFOLD["LOGIN"]["image"]`). |
 
 ## Who owns what

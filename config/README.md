@@ -51,4 +51,5 @@ secrets (production).
   `client_config`). Re-run `tests/test_storage.py` after upgrading django-storages.
 
 ## Open items
-- [ ] Phase 3: `LLM_BASE_URL`, `LLM_MODEL`, `GROQ_API_KEY`. Phase 5: CSP, Sentry, admin login rate limit. (Phase 4 OAuth was dropped on 2026-10-18.)
+- [x] Phase 3: `LLM_BASE_URL`, `LLM_MODEL`, `GROQ_API_KEY` (2026-10-18).
+- [ ] Phase 5: CSP, Sentry, admin login rate limit. (Phase 4 OAuth was dropped on 2026-10-18.)

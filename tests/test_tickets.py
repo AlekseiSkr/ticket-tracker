@@ -2,7 +2,7 @@ import threading
 from datetime import timedelta
 
 import pytest
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files.storage import InMemoryStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -11,7 +11,7 @@ from django.db import connection
 from django.db.models import Min, Q
 from django.utils import timezone
 
-from tickets.models import OPEN_STATUSES, TRANSITIONS, Agent, Comment, Customer, Ticket
+from tickets.models import OPEN_STATUSES, TRANSITIONS, Agent, Comment, Ticket
 from tickets.validators import MAX_ATTACHMENT_BYTES, validate_attachment
 
 S = Ticket.Status
@@ -31,33 +31,6 @@ def _memory_storage(settings):
         **settings.STORAGES,
         "default": {"BACKEND": "tests.test_tickets.MemoryS3Storage"},
     }
-
-
-def make_user(username: str, group: str) -> User:
-    user = User.objects.create_user(username, password="x", is_staff=True, first_name=username)
-    user.groups.add(Group.objects.get(name=group))
-    Agent.objects.create(user=user)
-    return User.objects.get(pk=user.pk)  # fresh instance: no cached permissions
-
-
-@pytest.fixture
-def lead(db):
-    return make_user("lea", "Support Lead")
-
-
-@pytest.fixture
-def agent(db):
-    return make_user("mart", "Agent")
-
-
-@pytest.fixture
-def other_agent(db):
-    return make_user("kati", "Agent")
-
-
-@pytest.fixture
-def customer(db):
-    return Customer.objects.create(name="Anna Saar", email="anna@customer.example")
 
 
 def ticket_for(customer, assignee=None, subject="Can't log in", **kwargs):
@@ -410,7 +383,7 @@ def test_agent_cannot_reach_another_agents_ticket_by_any_url(client, customer, a
     assert (theirs.status, theirs.assignee_id) == (S.OPEN, other_agent.agent.pk)
 
 
-def test_agent_never_sees_wip_caps_or_the_agent_autocomplete(client, customer, agent):
+def test_agent_never_sees_wip_caps_or_the_agent_autocomplete(client, customer, agent, settings):
     ticket = ticket_for(customer, agent.agent, status=S.OPEN)
     client.force_login(agent)
     pages = [
@@ -427,6 +400,17 @@ def test_agent_never_sees_wip_caps_or_the_agent_autocomplete(client, customer, a
         secure=True,
     )
     assert autocomplete.status_code == 403
+    # The AI form assistant: no Agent form for Agents, and no cap in the ticket form's context.
+    settings.GROQ_API_KEY = ""  # answers come from the fallback, built from the same context
+    for model, status in (("agent", 403), ("ticket", 200)):
+        response = client.post(
+            "/admin/assistant/",
+            {"app_label": "tickets", "model_name": model, "question": "What's my cap?"},
+            content_type="application/json",
+            secure=True,
+        )
+        assert response.status_code == status, model
+        assert "Work-in-progress cap" not in response.content.decode(), model
 
 
 # --- Phase 2: lead bulk actions ------------------------------------------------------------

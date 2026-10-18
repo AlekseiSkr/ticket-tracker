@@ -2,7 +2,7 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Live (76 tests passing, 95% coverage, on 2026-10-18) |
+| **Status**   | Live (87 tests passing, 95% coverage, on 2026-10-18) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
 | **Updated**  | 2026-10-15 |
@@ -28,7 +28,8 @@ invariants.
 ## How it's set up
 | File | Covers |
 |---|---|
-| `conftest.py` | Autouse fixture: plain static storage, because tests run with `DEBUG=False` and no `collectstatic`. |
+| `conftest.py` | Autouse fixture: plain static storage, because tests run with `DEBUG=False` and no `collectstatic`. Shared fixtures: `lead`, `agent`, `other_agent`, `customer`, and the `make_user` helper. |
+| `test_assistant.py` | The AI form assistant: prompt contents (metadata and rules in, ticket data out); read-only marking for Agents; Lead-only forms and other agents' tickets refused; fallback on timeout, 429 and missing config; question scrubbing and cap; rate limit; staff-only with CSRF; widget present. |
 | `test_env.py` | `require_env` and the other helpers fail loudly on missing or invalid values. |
 | `test_health.py` | `/healthz` makes zero queries; `/readyz` up and 503; the admin login page renders. |
 | `test_admin_theme.py` | Dark theme, lime primary, self-hosted fonts, favicon and login art; no dead "Return to site"; skip link before the sidebar; dashboard greeting; Unfold auth admins; branded 404; "Local" badge only under `DEBUG`. |
