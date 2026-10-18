@@ -11,7 +11,7 @@ web
 ## Users
 - **Support agents:** work their own tickets and the unassigned queue every day, usually on a laptop and for hours at a time. Speed and scanability matter more than delight.
 - **Support leads:** assign, close, reopen and watch SLA breaches and agent load. They have full access.
-- **Viewers:** read-only, with customer email masked. Only if self-signup is enabled.
+- **Accounts:** pre-made only, as Benrey asked on 2026-10-18: a Lead and an Agent login for each of two reviewers. No self-signup.
 - **Reviewers at Benrey** *(inferred)*: evaluate the build as a take-home. They look for a non-technical-friendly, considered UI that is still the framework's own admin.
 
 ## Product Purpose

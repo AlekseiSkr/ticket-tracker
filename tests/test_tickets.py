@@ -309,17 +309,26 @@ def test_attachment_size_cap():
 # --- Seed ----------------------------------------------------------------------------------
 
 
-def test_seed_users_needs_passwords_from_env(db, monkeypatch):
+def test_seed_users_makes_a_lead_and_an_agent_per_reviewer(db, monkeypatch):
     from django.core.exceptions import ImproperlyConfigured
 
-    monkeypatch.delenv("DEMO_LEAD_PASSWORD", raising=False)
+    names = [f"DEMO_{role}_{n}_PASSWORD" for n in (1, 2) for role in ("LEAD", "AGENT")]
+    for name in names:
+        monkeypatch.delenv(name, raising=False)
     with pytest.raises(ImproperlyConfigured):
         call_command("seed_users")
-    monkeypatch.setenv("DEMO_LEAD_PASSWORD", "Lead-demo-2026!x")
-    monkeypatch.setenv("DEMO_AGENT_PASSWORD", "Agent-demo-2026!x")
+    for i, name in enumerate(names):
+        monkeypatch.setenv(name, f"Review-demo-2026!{i}x")
     call_command("seed_users")
-    assert User.objects.get(username="lead").has_perm("tickets.close_ticket")
-    assert not User.objects.get(username="agent").has_perm("tickets.close_ticket")
+    for n in (1, 2):
+        lead, agent = (
+            User.objects.get(username=f"lead-{n}"),
+            User.objects.get(username=f"agent-{n}"),
+        )
+        assert lead.has_perm("tickets.close_ticket") and lead.agent
+        assert not agent.has_perm("tickets.close_ticket") and agent.agent
+    # Separate passwords: one reviewer's password doesn't open the other's account.
+    assert not User.objects.get(username="lead-2").check_password("Review-demo-2026!0x")
 
 
 def test_seed_demo_obeys_the_workflow_rules(db):
