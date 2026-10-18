@@ -56,7 +56,7 @@ Indexes on `(status, priority)` and `(assignee, status)`.
 | 2. Tests + CI/CD | Rule matrix, concurrency, role leak sweep, seed invariants; deploy on green | **Done 2026-10-18** (v0.2: 76 tests, 95% coverage, CI gate at 93%) |
 | 3. AI assistant | Grounded chat with a fallback | **Done 2026-10-18** (v0.3; `GROQ_API_KEY` set on Fly) |
 | 4. OAuth | GitHub login, approval-gated | **Dropped 2026-10-18:** Benrey wants pre-made accounts for two reviewers |
-| 5. Hardening | Login rate limit, CSP, Sentry, runbook, final README. **v1.0** | **Done in code 2026-10-18**; Sentry needs its DSN on Fly |
+| 5. Hardening | Login rate limit, CSP, Sentry, runbook, final README. **v1.0** | **Done 2026-10-18**; Sentry live 2026-10-19 |
 | 6. Polish (optional) | Role-aware dashboard | — |
 
 ## Day-1 spikes (pass/fail)

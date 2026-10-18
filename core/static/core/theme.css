@@ -1,5 +1,5 @@
 /*
- * Admin theme in the Benrey design language (DESIGN.md, docs/features/design-language.md).
+ * Admin theme in the Benrey design language (docs/DESIGN.md, docs/features/design-language.md).
  * Colours come from UNFOLD["COLORS"] in config/settings.py; this file carries what the colour
  * ramps can't: self-hosted type, the lime-on-dark controls, the signature lit line, and the
  * browser surfaces. It is unlayered on purpose: Unfold's Tailwind rules live in cascade

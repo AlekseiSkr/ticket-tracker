@@ -89,7 +89,7 @@ benrey.io's language — a near-black console lit by one acid lime — applied t
 
 Navigation, tables, forms and controls stay Django's and Unfold's own, so an agent knows where everything is before noticing the style.
 
-Source capture: `C:\Users\Aleksei\Software\Projects\design-lab\benrey.io\DESIGN.md` (measured 2026-10-15). Wiring: [docs/features/design-language.md](docs/features/design-language.md).
+Source capture: `C:\Users\Aleksei\Software\Projects\design-lab\benrey.io\DESIGN.md` (measured 2026-10-15). Wiring: [features/design-language.md](features/design-language.md).
 
 ## Colors
 

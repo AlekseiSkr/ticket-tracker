@@ -8,7 +8,7 @@
 | **Updated**  | 2026-10-18 |
 | **Where**    | `TEMPLATES["DIRS"]` in `config/settings.py` (searched before app templates) |
 | **Cost**     | $0 |
-| **Depends on** | [../DESIGN.md](../DESIGN.md), [../docs/features/design-language.md](../docs/features/design-language.md) |
+| **Depends on** | [../docs/DESIGN.md](../docs/DESIGN.md), [../docs/features/design-language.md](../docs/features/design-language.md) |
 
 ## What
 The few templates the project owns: branded error pages and two thin admin overrides (see

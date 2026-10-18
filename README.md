@@ -7,7 +7,11 @@ Detail lives in [docs/](docs/README.md):
 - one doc per feature and external service: [docs/features/](docs/features/);
 - the build plan: [docs/plan.md](docs/plan.md);
 - operations: [docs/runbook.md](docs/runbook.md);
+- product context and the admin's design system: [docs/PRODUCT.md](docs/PRODUCT.md),
+  [docs/DESIGN.md](docs/DESIGN.md);
 - a `README.md` in every code directory.
+
+`CLAUDE.md` (working rules for coding agents) stays at the root, where Claude Code loads it.
 
 ## Introduction
 
@@ -43,17 +47,19 @@ tickets the user may see. `/healthz` and `/readyz` are for the platform's health
   removed everywhere: forms, columns, filters, search, autocomplete and the AI's context.
 - **Attachments:** PNG, JPG, PDF or TXT, checked by content, up to 10 MB. They're stored
   under random names in a private bucket.
+- **Security:** ten failed logins from one IP block it for 15 minutes. A Content Security
+  Policy allows only the app's own scripts. Errors go to Sentry without personal data.
 
 ## Stack
 | Layer | Choice |
 |---|---|
 | App | Django 5.2 LTS, Python 3.13, uv |
-| Admin UI | Django admin + Unfold, custom dark theme ([DESIGN.md](DESIGN.md)) |
+| Admin UI | Django admin + Unfold, custom dark theme ([docs/DESIGN.md](docs/DESIGN.md)) |
 | Database | Postgres 17: Docker locally, Neon (Frankfurt) in production |
 | Files | Private S3 bucket: SeaweedFS locally, Cloudflare R2 (EU) in production |
 | Hosting | Fly.io, Frankfurt, one always-on 512 MB machine |
 | AI | Groq `openai/gpt-oss-20b`, called with the standard library |
-| Monitoring | Sentry (errors, no personal data); Fly health checks on `/healthz` |
+| Monitoring | Sentry: errors (no personal data) and an uptime monitor on `/healthz`; Fly health checks |
 | CI/CD | GitHub Actions: ruff, mypy, pytest (93% coverage gate), gitleaks, Docker build; deploys on green `main` |
 
 ## Setup

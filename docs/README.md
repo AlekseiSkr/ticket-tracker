@@ -39,8 +39,11 @@ nobody reads because it's long is worse than no doc):
 | `.github/` | Dependabot, repo automation | Live | [.github/README.md](../.github/README.md) |
 | `.github/workflows/` | CI and deploy pipelines | Live | [.github/workflows/README.md](../.github/workflows/README.md) |
 
-The root is covered by [../README.md](../README.md) (overview, setup and the brief report), [runbook.md](runbook.md) (operations), [../CLAUDE.md](../CLAUDE.md) (working rules),
-[../PRODUCT.md](../PRODUCT.md) (product context) and [../DESIGN.md](../DESIGN.md) (the admin's design system).
+Project-level docs:
+- [../README.md](../README.md): overview, setup and the brief report.
+- [runbook.md](runbook.md): operations.
+- [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md): product context and the admin's design system (read by the impeccable design skill).
+- [../CLAUDE.md](../CLAUDE.md): working rules for coding agents. It stays at the root because Claude Code only loads it from there.
 
 ## Feature index
 
@@ -57,7 +60,7 @@ The root is covered by [../README.md](../README.md) (overview, setup and the bri
 | Hosting (Fly.io, aleksei-ticket-tracker.fly.dev) | Live | [hosting-fly.md](features/hosting-fly.md) |
 | Authentication and roles | Live (roles, reviewer accounts) | [authentication-and-roles.md](features/authentication-and-roles.md) |
 | AI form assistant (Groq) | Live | [ai-form-assistant.md](features/ai-form-assistant.md) |
-| Error monitoring (Sentry) | Live in code (DSN not set yet) | [error-monitoring.md](features/error-monitoring.md) |
+| Error monitoring (Sentry) | Live | [error-monitoring.md](features/error-monitoring.md) |
 | Content Security Policy | Live in code | [content-security-policy.md](features/content-security-policy.md) |
 | Demo data (seed) | Live (commands); reset workflow planned | [demo-data.md](features/demo-data.md) |
 

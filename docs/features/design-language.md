@@ -8,7 +8,7 @@
 | **Updated**  | 2026-10-15 |
 | **Where**    | `config/settings.py` (`UNFOLD`), `core/static/core/`, `core/admin.py`, `core/admin_ui.py`, `templates/` |
 | **Cost**     | $0 (fonts are SIL OFL 1.1, self-hosted) |
-| **Depends on** | [admin-ui.md](admin-ui.md), [../../DESIGN.md](../../DESIGN.md), [../../PRODUCT.md](../../PRODUCT.md) |
+| **Depends on** | [admin-ui.md](admin-ui.md), [../DESIGN.md](../DESIGN.md), [../PRODUCT.md](../PRODUCT.md) |
 
 ## What
 The admin wears benrey.io's design language:
@@ -18,7 +18,7 @@ The admin wears benrey.io's design language:
 - the source's conic card edge;
 - one signature move: the **lit line**, the glowing lime tick from benrey.io's method timeline. Here it marks the active sidebar item.
 
-The full system is in the root [DESIGN.md](../../DESIGN.md), and the product context in [PRODUCT.md](../../PRODUCT.md). Both are read by the impeccable design skill.
+The full system is in [docs/DESIGN.md](../DESIGN.md), and the product context in [docs/PRODUCT.md](../PRODUCT.md). Both are read by the impeccable design skill.
 
 Built 2026-10-15 with three Claude Code design skills:
 - **dembrandt:** measured the source tokens, ran a WCAG/button/form/status checklist, and the drift check.
@@ -72,5 +72,5 @@ No credentials.
 
 ## Open items
 - [ ] Phase 1: ticket status and priority badges. Lime for open/active only; red, amber, green and blue keep their single meanings.
-- [ ] Phase 1: check the role-restricted pages (Agent) against [DESIGN.md](../../DESIGN.md).
+- [ ] Phase 1: check the role-restricted pages (Agent) against [DESIGN.md](../DESIGN.md).
 - [ ] Add `latin-ext` font files if customer names need them.
