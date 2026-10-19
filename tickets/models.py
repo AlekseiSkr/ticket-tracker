@@ -55,6 +55,11 @@ class Agent(models.Model):
     def __str__(self) -> str:
         return self.user.get_full_name() or self.user.get_username()
 
+    @classmethod
+    def for_user(cls, user: Any) -> "Agent":
+        """Staff who write comments or claim tickets need a profile; create it on first use."""
+        return cls.objects.get_or_create(user=user)[0]
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)

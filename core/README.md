@@ -5,7 +5,7 @@
 | **Status**   | Live |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-18 |
+| **Updated**  | 2026-10-19 |
 | **Where**    | `core/` (Django app `core`) |
 | **Cost**     | $0 |
 | **Depends on** | [../config/README.md](../config/README.md), [../docs/features/health-checks.md](../docs/features/health-checks.md) |
@@ -24,6 +24,7 @@ This keeps `tickets/` purely about the domain, so ops code and business rules do
 |---|---|
 | `apps.py` | `CoreConfig`. |
 | `middleware.py` | `HealthCheckMiddleware` answers `/healthz` (liveness, zero DB queries) and `/readyz` (`SELECT 1`, 503 if the DB is down) before host validation and the HTTPS redirect. `ContentSecurityPolicyMiddleware` adds the CSP header (see [../docs/features/content-security-policy.md](../docs/features/content-security-policy.md)). |
+| `ratelimit.py` | `count()` and `hit()`: fixed-window counters in the default cache, shared by the login form and the assistant. Per process, so the real limits are up to 2x with two workers. |
 | `forms.py` | `RateLimitedLoginForm`: 10 failed admin logins per IP, then 15 minutes blocked (see [../docs/features/authentication-and-roles.md](../docs/features/authentication-and-roles.md)). |
 | `management/` | Operational commands (see [management/README.md](management/README.md)). |
 | `admin.py` | `User` and `Group` re-registered with Unfold's admin classes and forms. |
