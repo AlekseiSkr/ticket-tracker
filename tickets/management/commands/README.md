@@ -43,4 +43,4 @@ Order: run `seed_users` first, so the reviewer Agent accounts also get open tick
 - **Customer emails use the reserved `.example` domain,** so no real address ever appears.
 
 ## Open items
-- [ ] Phase 5: a GitHub Actions "Reset demo data" workflow that runs `seed_demo --reset` on Fly.
+- [x] A GitHub Actions "Reset demo data" workflow: not built (decided 2026-10-19); `fly ssh console -C "python manage.py seed_demo --reset"` does it.

@@ -5,7 +5,7 @@
 | **Status**   | Live (roles, reviewer accounts and login rate limit, 2026-10-18) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-18 |
+| **Updated**  | 2026-10-19 |
 | **Where**    | Django auth + admin; `tickets/migrations/0002_roles.py`; `manage.py seed_users` |
 | **Cost**     | $0 |
 | **Depends on** | [admin-ui.md](admin-ui.md), [configuration-and-secrets.md](configuration-and-secrets.md) |
@@ -20,7 +20,7 @@ Login goes through Django's own auth:
 - **Support Lead:** full access.
 - **Agent:**
   - sees only their own tickets plus the unassigned queue;
-  - priority and assignee are read-only, and "close" isn't available;
+  - priority is read-only, and "close" isn't available;
   - no Agents, Users or Groups pages;
   - no delete buttons.
 
@@ -45,7 +45,8 @@ Separate accounts per reviewer, rather than one shared login per role, keep each
   - **Agent:** view, add and change tickets; view and add comments; view, add and change customers; view tags. Nothing on agents, users or groups, so those pages and the WIP caps stay hidden.
 - **Code checks permissions, never group names:**
   - `Ticket.objects.visible_to()` limits Agents to their own tickets plus the queue. Another agent's ticket is not found.
-  - `TicketAdmin.get_readonly_fields` makes priority and assignee read-only for Agents.
+  - `TicketAdmin.get_readonly_fields` makes priority read-only for Agents, and the assignee read-only for everyone: it changes only through Claim and the Assign action, which apply the work-in-progress cap (fixed 2026-10-19; before that a Lead could bypass the cap through the form).
+  - `TicketAdmin.changelist_view` drops the action bar's agent and priority pickers for users without the matching actions.
   - `get_actions` removes the assign, close and priority actions.
   - The model methods re-check permissions, so the rules hold outside the admin too.
 - **Reviewer accounts:** `seed_users` creates the four accounts. Passwords come from `DEMO_LEAD_1_PASSWORD`, `DEMO_AGENT_1_PASSWORD`, `DEMO_LEAD_2_PASSWORD` and `DEMO_AGENT_2_PASSWORD`, and must pass Django's password validators.

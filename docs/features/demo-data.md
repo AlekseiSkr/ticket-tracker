@@ -2,11 +2,11 @@
 
 |              |                                            |
 |--------------|--------------------------------------------|
-| **Status**   | Live (commands); the live reset workflow comes in Phase 5 |
+| **Status**   | Live (commands; the live reset is one command, see the runbook) |
 | **Owner**    | Aleksei (GitHub: AlekseiSkr) |
 | **Created**  | 2026-10-15 |
-| **Updated**  | 2026-10-18 |
-| **Where**    | `manage.py seed_demo`, `manage.py seed_users`; GitHub Actions "Reset demo data" workflow |
+| **Updated**  | 2026-10-19 |
+| **Where**    | `manage.py seed_demo`, `manage.py seed_users` |
 | **Cost**     | $0 |
 | **Depends on** | [database.md](database.md), [file-storage.md](file-storage.md) |
 
@@ -38,7 +38,7 @@ destructive button in production is a smell.
   `docker compose exec web python manage.py seed_demo --reset`. About 30 s for 25k tickets.
 - **Production (first time):** `fly ssh console -C "python manage.py seed_users"` (passwords
   from Fly secrets), then `fly ssh console -C "python manage.py seed_demo --reset"`.
-- **Live:** GitHub → Actions → *Reset demo data* → Run workflow. It runs
+- **Live reset:** run
   `fly ssh console -C "python manage.py seed_demo --reset"`.
 
 ## Who owns what
@@ -54,4 +54,4 @@ destructive button in production is a smell.
 ## Open items
 - [x] Built in Phase 1 (2026-10-18). About 30 s locally for 25k tickets.
 - [ ] Measure against Neon (target < 3 min, spike S7) on the first production seed.
-- [ ] Phase 5: the GitHub Actions *Reset demo data* workflow.
+- [x] A one-click GitHub Actions reset workflow: not built (decided 2026-10-19); the one command above does it.

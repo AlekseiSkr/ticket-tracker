@@ -6,6 +6,8 @@ nobody reads because it's long is worse than no doc):
 - **Directory docs:** a `README.md` in **every directory that holds code or config**. It
   says what the directory does, why it's built that way, how its files fit together, and
   what to watch out for, so any person or agent can get up to speed on that folder alone.
+  One exception: `.github/` itself has none, because GitHub shows `.github/README.md` as the
+  repository's front page instead of the root README.
 - **Feature docs:** one per feature or external service in [features/](features/), covering
   accounts, setup steps and cross-cutting decisions.
 
@@ -36,7 +38,7 @@ nobody reads because it's long is worse than no doc):
 | `tests/` | pytest-django suite | Live | [tests/README.md](../tests/README.md) |
 | `docker/` | Config for local compose services | Live | [docker/README.md](../docker/README.md) |
 | `docker/seaweedfs/` | Local S3 emulator identities | Live | [docker/seaweedfs/README.md](../docker/seaweedfs/README.md) |
-| `.github/` | Dependabot, repo automation | Live | [.github/README.md](../.github/README.md) |
+| `.github/` | Dependabot config (no README here, see above) | Live | [features/ci-cd.md](features/ci-cd.md) |
 | `.github/workflows/` | CI and deploy pipelines | Live | [.github/workflows/README.md](../.github/workflows/README.md) |
 
 Project-level docs:

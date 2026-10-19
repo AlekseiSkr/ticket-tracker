@@ -5,7 +5,8 @@
 - **Run everything through Docker:** `docker compose exec web <cmd>` (pytest, ruff, mypy,
   manage.py). The host Python is not used.
 - **Start in a folder by reading its `README.md`.** Every directory that holds code or
-  config has one (template: `docs/_template.md`).
+  config has one (template: `docs/_template.md`), except `.github/`: GitHub would show a
+  `.github/README.md` as the repository's front page.
   - **New directory:** add its README and list it in the directory index in
     `docs/README.md`.
   - **Changed what's in a directory:** update that README in the same commit, including its
